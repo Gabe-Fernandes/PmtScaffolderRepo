@@ -1,16 +1,20 @@
-﻿namespace PmtScaffolder;
+﻿using System.Threading;
+
+namespace PmtScaffolder;
 
 public class UserInput
 {
   private static readonly UserInput _instance = new();
 
-  public string ProjPath { get; set; }
-  public string ProjName { get; set; }
+  public string ProjPath { get; set; } = "C:\\dev\\ps_scaffolding\\autogen\\autogen";
+  public string ProjName { get; set; } = "AutoGen";
+
+  public List<string> Controllers = ["Agile", "MyProjects"];
+  public List<List<string>> FileNames = [["one", "two", "three"], ["four", "five", "six"]];
+
   public List<string> Models = [];
-  public List<string> FileNames = [];
-  public List<string> DataTypes = [];
-  public List<string> Properties = [];
-  public List<string> Controllers = [];
+  public List<List<string>> DataTypes = [];
+  public List<List<string>> Properties = [];
 
   private UserInput() { }
 

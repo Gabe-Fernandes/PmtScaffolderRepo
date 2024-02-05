@@ -5,7 +5,7 @@ namespace PmtScaffolder;
 public static class Cmd
 {
   private static UserInput _userInput = UserInput.GetUserInput();
-  private static readonly Regex regex = new(@"^[a-zA-Z0-9_,]+$");
+  private static readonly Regex regex = new(@"^[a-zA-Z0-9_,@]+$");
   private static readonly Regex pathRegex = new(@"^[a-zA-Z0-9_,\-/"" .\\:]+$");
   private static readonly Regex projNameRegex = new(@"^[a-zA-Z0-9_,\-/""()!@#$%^&*. ]+$");
 
@@ -22,9 +22,9 @@ public static class Cmd
       case "pmt get proj-path": Console.WriteLine(_userInput.ProjPath); return true;
       case "pmt get proj-name": Console.WriteLine(_userInput.ProjName); return true;
       case "pmt get models": PrintCollection(_userInput.Models); return true;
-      case "pmt get file-names": PrintCollection(_userInput.FileNames); return true;
-      case "pmt get data-types": PrintCollection(_userInput.DataTypes); return true;
-      case "pmt get properties": PrintCollection(_userInput.Properties); return true;
+      case "pmt get file-names": Print2DCollection(_userInput.FileNames); return true;
+      case "pmt get data-types": Print2DCollection(_userInput.DataTypes); return true;
+      case "pmt get properties": Print2DCollection(_userInput.Properties); return true;
       case "pmt get controllers": PrintCollection(_userInput.Controllers); return true;
       case "pmt args": PrintArgs(); return true;
       case "pmt front": await FrontEnd.ScaffoldCode(); return true;
@@ -64,7 +64,7 @@ public static class Cmd
     else if (normalizedInput.IndexOf("file-names ") == 8 &&
       regex.IsMatch(input[19..]))
     {
-      _userInput.FileNames = ParseInput(input[19..]);
+      _userInput.FileNames = Parse2DInput(input[19..]);
       return true;
     }
     else if (normalizedInput.IndexOf("models ") == 8 &&
@@ -76,13 +76,13 @@ public static class Cmd
     else if (normalizedInput.IndexOf("data-types ") == 8 &&
       regex.IsMatch(input[19..]))
     {
-      _userInput.DataTypes = ParseInput(input[19..]);
+      _userInput.DataTypes = Parse2DInput(input[19..]);
       return true;
     }
     else if (normalizedInput.IndexOf("properties ") == 8 &&
       regex.IsMatch(input[19..]))
     {
-      _userInput.Properties = ParseInput(input[19..]);
+      _userInput.Properties = Parse2DInput(input[19..]);
       return true;
     }
 
@@ -107,6 +107,40 @@ public static class Cmd
     return collection;
   }
 
+  private static List<List<string>> Parse2DInput(string input)
+  {
+    List<List<string>> collection = [];
+    List<string> tempList = [];
+    string tempString = string.Empty;
+
+    for (int i = 0; i < input.Length; i++)
+    {
+      // this char separates elements
+      if (input[i] == ',')
+      {
+        tempList.Add(tempString);
+        tempString = string.Empty;
+        continue;
+      }
+      // this char separates lists
+      if (input[i] == '@')
+      {
+        tempList.Add(tempString);
+        collection.Add(tempList);
+
+        tempList = [];
+        tempString = string.Empty;
+        continue;
+      }
+
+      tempString += input[i];
+    }
+
+    tempList.Add(tempString);
+    collection.Add(tempList);
+    return collection;
+  }
+
   private static void PrintCollection(List<string> collection)
   {
     foreach (string item in collection)
@@ -115,23 +149,35 @@ public static class Cmd
     }
   }
 
+  private static void Print2DCollection(List<List<string>> collection)
+  {
+    foreach (List<string> list in collection)
+    {
+      foreach (string item in list)
+      {
+        Console.WriteLine(item);
+      }
+      Console.WriteLine();
+    }
+  }
+
   private static void PrintArgs()
   {
     Console.WriteLine("\n===== Scaffold Arguments =====");
-    Console.WriteLine("\nProject Name:");
+    Console.Write("\nProject Name: ");
     Console.WriteLine(_userInput.ProjName);
-    Console.WriteLine("\nProject Path:");
+    Console.Write("\nProject Path: ");
     Console.WriteLine(_userInput.ProjPath);
     Console.WriteLine("\nControllers:");
     PrintCollection(_userInput.Controllers);
     Console.WriteLine("\nFile Names:");
-    PrintCollection(_userInput.FileNames);
-    Console.WriteLine("\nModels:");
+    Print2DCollection(_userInput.FileNames);
+    Console.WriteLine("Models:");
     PrintCollection(_userInput.Models);
     Console.WriteLine("\nData Types:");
-    PrintCollection(_userInput.DataTypes);
-    Console.WriteLine("\nProperties:");
-    PrintCollection(_userInput.Properties);
-    Console.WriteLine("\n===== ___ =====\n");
+    Print2DCollection(_userInput.DataTypes);
+    Console.WriteLine("Properties:");
+    Print2DCollection(_userInput.Properties);
+    Console.WriteLine("===== ___ =====\n");
   }
 }
