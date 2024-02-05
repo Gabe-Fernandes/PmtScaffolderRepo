@@ -6,16 +6,13 @@ public class UserInput
 
   public string ProjPath { get; set; }
   public string ProjName { get; set; }
-  public string Models { get; set; }
-  public string FileNames { get; set; }
-  public string DataTypes { get; set; }
-  public string Properties { get; set; }
-  public string Controllers { get; set; }
+  public List<string> Models = [];
+  public List<string> FileNames = [];
+  public List<string> DataTypes = [];
+  public List<string> Properties = [];
+  public List<string> Controllers = [];
 
-  private UserInput()
-  {
-
-  }
+  private UserInput() { }
 
   public static UserInput GetUserInput()
   {

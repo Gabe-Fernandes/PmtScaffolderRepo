@@ -6,10 +6,10 @@ public static class Cmd
 {
   private static UserInput _userInput = UserInput.GetUserInput();
   private static readonly Regex regex = new(@"^[a-zA-Z0-9_,]+$");
-  private static readonly Regex pathRegex = new(@"^[a-zA-Z0-9_,\-/"" .]+$");
+  private static readonly Regex pathRegex = new(@"^[a-zA-Z0-9_,\-/"" .\\:]+$");
   private static readonly Regex projNameRegex = new(@"^[a-zA-Z0-9_,\-/""()!@#$%^&*. ]+$");
 
-  public static bool RunValidInput(string input)
+  public static async Task<bool> RunValidInput(string input)
   {
     string normalizedInput = input.ToLower();
 
@@ -21,13 +21,13 @@ public static class Cmd
       case "pmt cls": Console.Clear(); return true;
       case "pmt get proj-path": Console.WriteLine(_userInput.ProjPath); return true;
       case "pmt get proj-name": Console.WriteLine(_userInput.ProjName); return true;
-      case "pmt get models": Console.WriteLine(_userInput.Models); return true;
-      case "pmt get file-names": Console.WriteLine(_userInput.FileNames); return true;
-      case "pmt get data-types": Console.WriteLine(_userInput.DataTypes); return true;
-      case "pmt get properties": Console.WriteLine(_userInput.Properties); return true;
-      case "pmt get controllers": Console.WriteLine(_userInput.Controllers); return true;
+      case "pmt get models": PrintCollection(_userInput.Models); return true;
+      case "pmt get file-names": PrintCollection(_userInput.FileNames); return true;
+      case "pmt get data-types": PrintCollection(_userInput.DataTypes); return true;
+      case "pmt get properties": PrintCollection(_userInput.Properties); return true;
+      case "pmt get controllers": PrintCollection(_userInput.Controllers); return true;
       case "pmt args": PrintArgs(); return true;
-      case "pmt front": return true;
+      case "pmt front": await FrontEnd.ScaffoldCode(); return true;
       case "pmt back": return true;
     }
 
@@ -58,35 +58,61 @@ public static class Cmd
     else if (normalizedInput.IndexOf("controllers ") == 8 &&
       regex.IsMatch(input[20..]))
     {
-      _userInput.Controllers = input[20..];
+      _userInput.Controllers = ParseInput(input[20..]);
       return true;
     }
     else if (normalizedInput.IndexOf("file-names ") == 8 &&
       regex.IsMatch(input[19..]))
     {
-      _userInput.FileNames = input[19..];
+      _userInput.FileNames = ParseInput(input[19..]);
       return true;
     }
     else if (normalizedInput.IndexOf("models ") == 8 &&
       regex.IsMatch(input[15..]))
     {
-      _userInput.Models = input[15..];
+      _userInput.Models = ParseInput(input[15..]);
       return true;
     }
     else if (normalizedInput.IndexOf("data-types ") == 8 &&
       regex.IsMatch(input[19..]))
     {
-      _userInput.DataTypes = input[19..];
+      _userInput.DataTypes = ParseInput(input[19..]);
       return true;
     }
     else if (normalizedInput.IndexOf("properties ") == 8 &&
       regex.IsMatch(input[19..]))
     {
-      _userInput.Properties = input[19..];
+      _userInput.Properties = ParseInput(input[19..]);
       return true;
     }
 
     return false;
+  }
+
+  private static List<string> ParseInput(string input)
+  {
+    List<string> collection = [];
+    string tempString = string.Empty;
+    for (int i = 0; i < input.Length; i++)
+    {
+      if (input[i] == ',')
+      {
+        collection.Add(tempString);
+        tempString = string.Empty;
+        continue;
+      }
+      tempString += input[i];
+    }
+    collection.Add(tempString);
+    return collection;
+  }
+
+  private static void PrintCollection(List<string> collection)
+  {
+    foreach (string item in collection)
+    {
+      Console.WriteLine(item);
+    }
   }
 
   private static void PrintArgs()
@@ -97,15 +123,15 @@ public static class Cmd
     Console.WriteLine("\nProject Path:");
     Console.WriteLine(_userInput.ProjPath);
     Console.WriteLine("\nControllers:");
-    Console.WriteLine(_userInput.Controllers);
+    PrintCollection(_userInput.Controllers);
     Console.WriteLine("\nFile Names:");
-    Console.WriteLine(_userInput.FileNames);
+    PrintCollection(_userInput.FileNames);
     Console.WriteLine("\nModels:");
-    Console.WriteLine(_userInput.Models);
+    PrintCollection(_userInput.Models);
     Console.WriteLine("\nData Types:");
-    Console.WriteLine(_userInput.DataTypes);
+    PrintCollection(_userInput.DataTypes);
     Console.WriteLine("\nProperties:");
-    Console.WriteLine(_userInput.Properties);
+    PrintCollection(_userInput.Properties);
     Console.WriteLine("\n===== ___ =====\n");
   }
 }
