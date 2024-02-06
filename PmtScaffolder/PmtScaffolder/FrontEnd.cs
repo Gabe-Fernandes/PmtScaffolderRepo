@@ -6,16 +6,15 @@ public static class FrontEnd
 
 
 
-  public static async Task ScaffoldCode()
+  public static async Task ScaffoldFrontEndCode()
   {
     Console.WriteLine(await GenerateControllerClass(_userInput.ProjPath + "/Controllers"));
     Console.WriteLine(await GenerateCode(_userInput.ProjPath + "/Styles", "scss"));
     Console.WriteLine(await GenerateCode(_userInput.ProjPath + "/wwwroot/js", "js"));
     Console.WriteLine(await GenerateCode(_userInput.ProjPath + "/Views", "cshtml"));
-    // controller get methods
-    // layout
-    // viewstart
-    // viewstart CSS
+    // (insertion) controller get methods
+    // (insertion) viewstart CSS
+    // overwrite needs to check if files exist
   }
 
   private static async Task<string> GenerateCode(string filePath, string fileType, bool overwrite = false)
@@ -33,22 +32,21 @@ public static class FrontEnd
       // Ensure there is a dir for each controller
       switch (TestPath(filePath, currentControllerPath))
       {
-        case 0: await PSCmd.RunPowerShell(filePath, $"mkdir {_userInput.Controllers[i]}"); break;
+        case 0: await GenerateControllerDir(filePath, i, fileType); break;
         case 1: break;
         default: return $"Failed to test path: {currentControllerPath}";
       }
+      
+      if (overwrite == false) { continue; }
 
       // Generate code files
       for (int j = 0; j < _userInput.FileNames[i].Count; j++)
       {
-        if (overwrite)
+        switch (fileType)
         {
-          switch (fileType)
-          {
-            case "scss": await PSCmd.RunPowerShellBatch(currentControllerPath, FrontEndTemplates.SassFile(_userInput.FileNames[i][j])); break;
-            case "js": await PSCmd.RunPowerShellBatch(currentControllerPath, FrontEndTemplates.JsFile(_userInput.FileNames[i][j])); break;
-            case "cshtml": await PSCmd.RunPowerShellBatch(currentControllerPath, FrontEndTemplates.CsHtmlFile(_userInput.FileNames[i][j], _userInput.Controllers[i])); break;
-          }
+          case "scss": await PSCmd.RunPowerShellBatch(currentControllerPath, FrontEndTemplates.SassFile(_userInput.FileNames[i][j])); break;
+          case "js": await PSCmd.RunPowerShellBatch(currentControllerPath, FrontEndTemplates.JsFile(_userInput.FileNames[i][j])); break;
+          case "cshtml": await PSCmd.RunPowerShellBatch(currentControllerPath, FrontEndTemplates.CsHtmlFile(_userInput.FileNames[i][j], _userInput.Controllers[i])); break;
         }
       }
     }
@@ -60,13 +58,23 @@ public static class FrontEnd
   {
     for (int i = 0; i < _userInput.Controllers.Count; i++)
     {
-      if (overwrite)
-      {
-        await PSCmd.RunPowerShellBatch(filePath, FrontEndTemplates.ControllerFile(_userInput.Controllers[i]));
-      }
+      if (overwrite == false) { return string.Empty; }
+      await PSCmd.RunPowerShellBatch(filePath, FrontEndTemplates.ControllerFile(_userInput.Controllers[i]));
     }
-    
+
     return "controller class(es) complete";
+  }
+
+  private static async Task GenerateControllerDir(string filePath, int i, string fileType)
+  {
+    await PSCmd.RunPowerShell(filePath, $"mkdir {_userInput.Controllers[i]}");
+
+    if (fileType == "cshtml")
+    {
+      string currentControllerPath = $"{filePath}/{_userInput.Controllers[i]}";
+      await PSCmd.RunPowerShellBatch(currentControllerPath, FrontEndTemplates.ViewStartFile(_userInput.Controllers[i]));
+      await PSCmd.RunPowerShellBatch(currentControllerPath, FrontEndTemplates.LayoutFile(_userInput.Controllers[i]));
+    }
   }
 
   private static int TestPath(string currentPathToTestFrom, string pathToTest)

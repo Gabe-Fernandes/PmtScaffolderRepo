@@ -27,8 +27,8 @@ public static class Cmd
       case "pmt get properties": Print2DCollection(_userInput.Properties); return true;
       case "pmt get controllers": PrintCollection(_userInput.Controllers); return true;
       case "pmt args": PrintArgs(); return true;
-      case "pmt front": await FrontEnd.ScaffoldCode(); return true;
-      case "pmt back": return true;
+      case "pmt front": await FrontEnd.ScaffoldFrontEndCode(); return true;
+      case "pmt back": await BackEnd.ScaffoldBackEndCode(); return true;
     }
 
     if (normalizedInput.IndexOf("pmt set ") == 0)
