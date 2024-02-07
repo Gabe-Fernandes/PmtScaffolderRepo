@@ -3,6 +3,7 @@
 public static class FrontEnd
 {
   private static readonly UserInput _userInput = UserInput.GetUserInput();
+  private static readonly string br = Environment.NewLine;
 
 
 
@@ -15,7 +16,6 @@ public static class FrontEnd
     // (insertion) controller get methods
     // (insertion) viewstart CSS
     // overwrite needs to check if files exist
-    //await InsertCode(_userInput.ProjPath, "\n// hello 1", "program.cs");
   }
 
   private static async Task<string> GenerateCode(string filePath, string fileType, bool overwrite = true)
@@ -48,7 +48,7 @@ public static class FrontEnd
           case "scss": await PSCmd.RunPowerShellBatch(currentControllerPath, FrontEndTemplates.SassFile(_userInput.FileNames[i][j])); break;
           case "js": await PSCmd.RunPowerShellBatch(currentControllerPath, FrontEndTemplates.JsFile(_userInput.FileNames[i][j])); break;
           case "cshtml": await PSCmd.RunPowerShellBatch(currentControllerPath, FrontEndTemplates.CsHtmlFile(_userInput.FileNames[i][j], _userInput.Controllers[i]));
-                         await InsertCode(currentControllerPath, FrontEndTemplates.CssLinkEle(_userInput.FileNames[i][j]), $"_{_userInput.Controllers[i]}_Layout.cshtml"); break;
+                         await InsertCode(currentControllerPath, FrontEndTemplates.CssLinkEle(_userInput.FileNames[i][j]), $"_{_userInput.Controllers[i]}_Layout.cshtml", true); break;
         }
       }
     }
@@ -86,7 +86,7 @@ public static class FrontEnd
     return (bufferedCmd.Result.StandardOutput == "True\r\n") ? 1 : 0;
   }
 
-  private static async Task InsertCode(string parentPath, string codeToInsert, string fileNameWithExtension) // works, but adds empty lines at the end of the file and changes indenting
+  private static async Task InsertCode(string parentPath, string codeToInsert, string fileNameWithExtension, bool htmlLandmark = false)
   {
     // extract file text
     string pathToFile = Path.Combine(parentPath, fileNameWithExtension);
@@ -95,9 +95,9 @@ public static class FrontEnd
     string fileText = fileContent.StandardOutput;
 
     // locate PMT Landmark
-    const string landmark = "// PMT Landmark";
+    string landmark = htmlLandmark ? "<!--PMT Landmark-->" : "// PMT Landmark";
     int landmarkIndex = fileText.IndexOf(landmark);
-    if (landmarkIndex == -1)
+    if (landmarkIndex == -1) // error handling
     {
       Console.WriteLine($"\n===========================Please ensure the code file at {pathToFile} has the comment, \"{landmark}\" above where lines of code are to be inserted.===========================\n");
       return;
@@ -105,11 +105,56 @@ public static class FrontEnd
 
     // partition code file, concatenate, and write
     string preLandmark = fileText.Substring(0, landmarkIndex + landmark.Length);
-    string postLandmark = fileText.Substring(landmarkIndex + landmark.Length); // +1?
+    string postLandmark = fileText.Substring(landmarkIndex + landmark.Length);
     string finalOutput = preLandmark + codeToInsert + postLandmark;
-    finalOutput = finalOutput.Replace("\"", "\\\"");
-    finalOutput = finalOutput.Replace("  ", "\t");
     finalOutput = finalOutput.Substring(0, finalOutput.Length - 4); // chop the last 2 line breaks off
-    await PSCmd.RunPowerShell(parentPath, $"Write-Output '{finalOutput}' > {fileNameWithExtension}");
+    // multiple iterations of insertions were adding spaces at the end of files due to how PowerShell writes them which eventually register as tabs - remove this space when it's present
+    finalOutput = (finalOutput[finalOutput.Length-1] == ' ') ? finalOutput.Substring(0, finalOutput.Length-1) : finalOutput;
+    finalOutput = finalOutput.Replace("  ", "PMT_TAB");
+    finalOutput = finalOutput.Replace("\t", "PMT_TAB");
+    await PSCmd.RunPowerShellBatch(parentPath, CreateTemplateFormat(finalOutput, fileNameWithExtension));
+  }
+
+  private static string[] CreateTemplateFormat(string rawOutput, string fileNameWithExtension)
+  {
+    List<string> output = [];
+    string tempString = "Write-Output '";
+
+    for (int i = 0; i < rawOutput.Length; i++)
+    {
+      if (rawOutput[i..].StartsWith("PMT_TAB"))
+      {
+        // add \t for every occurence of PMT_TAB
+        tempString += "\t";
+
+        for (int j = i + 7; j < rawOutput.Length; j += 7)
+        {
+          if (rawOutput[j..].StartsWith("PMT_TAB") == false) { i = j - 1; break; }
+          tempString += "\t";
+        }
+        continue;
+      }
+
+      if (rawOutput[i..].StartsWith(" \r\n"))
+      {
+        output.Add(tempString);
+
+        // add line breaks for every occurence of " \r\n" after the first occurence (the first is accounted for by the br at the start of each tempString)
+        for (int j = i+3; j < rawOutput.Length; j += 3)
+        {
+          if (rawOutput[j..].StartsWith(" \r\n") == false) { i = j-1; break; }
+          output.Add(br);
+        }
+
+        tempString = br;
+        continue;
+      }
+
+      tempString += rawOutput[i];
+    }
+
+    output.Add(tempString);
+    output.Add($"' > {fileNameWithExtension}");
+    return output.ToArray();
   }
 }

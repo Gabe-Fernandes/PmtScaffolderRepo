@@ -79,7 +79,7 @@ public static class FrontEndTemplates
               $@"{br}  <title>@ViewData[""Title""] - {_userInput.ProjName}</title>",
               $@"{br}  <link rel=""icon"" href="""">",
               $@"{br}  <link rel=""stylesheet"" href=""~/css/site.css"" asp-append-version=""true"" />",
-              $@"{br}  // PMT Landmark",
+              $@"{br}  <!--PMT Landmark-->",
               $@"{br}  <script type=""text/javascript"" src=""~/lib/jquery/dist/jquery.js""></script>",
               $@"{br}  <script defer type=""text/javascript"" src=""~/js/site.js""></script>",
               $@"{br}</head>",
@@ -98,6 +98,6 @@ public static class FrontEndTemplates
 
   public static string CssLinkEle(string fileName)
   {
-    return $"{br}\t<link rel=\"stylesheet\" href=\"~/css/{fileName}.css\" asp-append-version=\"true\" />";
+    return $"{br}PMT_TAB<link rel=\"stylesheet\" href=\"~/css/{fileName}.css\" asp-append-version=\"true\" />";
   }
 }

@@ -168,6 +168,10 @@ public static class Cmd
     Console.WriteLine(_userInput.ProjName);
     Console.Write("\nProject Path: ");
     Console.WriteLine(_userInput.ProjPath);
+    Console.Write("\nTest Project Name: ");
+    Console.WriteLine(_userInput.TestProjName);
+    Console.Write("\nTest Project Path: ");
+    Console.WriteLine(_userInput.TestProjPath);
     Console.WriteLine("\nControllers:");
     PrintCollection(_userInput.Controllers);
     Console.WriteLine("\nFile Names:");

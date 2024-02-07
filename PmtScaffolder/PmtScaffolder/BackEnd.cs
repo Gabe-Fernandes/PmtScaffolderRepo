@@ -21,7 +21,7 @@ public static class BackEnd
     // AppUser edge case with unit tests
   }
 
-  private static async Task<string> GenerateCode(string filePath, string fileType, bool overwrite = false)
+  private static async Task<string> GenerateCode(string filePath, string fileType, bool overwrite = true)
   {
     switch (TestPath(_userInput.ProjPath, filePath))
     {
