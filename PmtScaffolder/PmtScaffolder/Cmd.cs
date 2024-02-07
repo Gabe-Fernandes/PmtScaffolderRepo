@@ -19,8 +19,12 @@ public static class Cmd
       case "pmt exit": Environment.Exit(0); return true;
       case "cls": Console.Clear(); return true;
       case "pmt cls": Console.Clear(); return true;
+      case "pmt": PrintPmtHelp(); return true;
+      case "pmt help": PrintPmtHelp(); return true;
       case "pmt get proj-path": Console.WriteLine(_userInput.ProjPath); return true;
       case "pmt get proj-name": Console.WriteLine(_userInput.ProjName); return true;
+      case "pmt get test-proj-path": Console.WriteLine(_userInput.TestProjPath); return true;
+      case "pmt get test-proj-name": Console.WriteLine(_userInput.TestProjName); return true;
       case "pmt get models": PrintCollection(_userInput.Models); return true;
       case "pmt get file-names": Print2DCollection(_userInput.FileNames); return true;
       case "pmt get data-types": Print2DCollection(_userInput.DataTypes); return true;
@@ -53,6 +57,18 @@ public static class Cmd
       projNameRegex.IsMatch(input[18..]))
     {
       _userInput.ProjName = input[18..];
+      return true;
+    }
+    else if (normalizedInput.IndexOf("test-proj-path ") == 8 &&
+      pathRegex.IsMatch(input[23..]))
+    {
+      _userInput.TestProjPath = input[23..];
+      return true;
+    }
+    else if (normalizedInput.IndexOf("test-proj-name ") == 8 &&
+      projNameRegex.IsMatch(input[23..]))
+    {
+      _userInput.TestProjName = input[23..];
       return true;
     }
     else if (normalizedInput.IndexOf("controllers ") == 8 &&
@@ -192,5 +208,53 @@ public static class Cmd
     Console.WriteLine("\n========================== Models ==========================\n");
     PrintModels();
     Console.WriteLine("\n============================================================\n");
+  }
+
+  private static void PrintPmtHelp()
+  {
+    Console.WriteLine("\n==================== PMT ====================\n");
+    Console.WriteLine("pmt exit");
+    Console.WriteLine("exit");
+    Console.WriteLine("pmt cls");
+    Console.WriteLine("cls");
+    Console.WriteLine("pmt help");
+    Console.WriteLine("pmt");
+
+    Console.WriteLine("\npmt get proj-path");
+    Console.WriteLine("pmt get proj-name");
+    Console.WriteLine("pmt get test-proj-path");
+    Console.WriteLine("pmt get test-proj-name");
+
+    Console.WriteLine("pmt get controllers");
+    Console.WriteLine("pmt get file-names");
+
+    Console.WriteLine("pmt get models");
+    Console.WriteLine("pmt get data-types");
+    Console.WriteLine("pmt get properties");
+
+    Console.WriteLine("\n\n-Separate lists with ',' (no spaces).");
+    Console.WriteLine("Example:");
+    Console.WriteLine("pmt set controllers account,inventory,crm\n\n");
+    Console.WriteLine("-2D lists like properties for the models list use ',' and '@' similarly");
+    Console.WriteLine("Example:");
+    Console.WriteLine("pmt set properties id,firstName,lastName,age@id,title,description\n\n");
+    Console.WriteLine("-The first char will automatically be made upper/lower case as needed.\n\n");
+
+    Console.WriteLine("pmt set proj-path");
+    Console.WriteLine("pmt set proj-name");
+    Console.WriteLine("pmt set test-proj-path");
+    Console.WriteLine("pmt set test-proj-name");
+
+    Console.WriteLine("pmt set controllers");
+    Console.WriteLine("pmt set file-names");
+
+    Console.WriteLine("pmt set models");
+    Console.WriteLine("pmt set data-types");
+    Console.WriteLine("pmt set properties");
+
+    Console.WriteLine("\npmt args");
+    Console.WriteLine("pmt front");
+    Console.WriteLine("pmt back");
+    Console.WriteLine("\n=============================================\n");
   }
 }
