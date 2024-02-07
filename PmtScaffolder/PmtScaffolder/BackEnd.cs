@@ -13,7 +13,6 @@ public static class BackEnd
     Console.WriteLine(await GenerateCode(_userInput.ProjPath + "/Data/RepoInterfaces", "repo interface"));
     Console.WriteLine(await GenerateCode(_userInput.ProjPath + "/Data/Repos", "repository"));
     Console.WriteLine(await GenerateCode(_userInput.TestProjPath + "/Data/Repos", "unit test"));
-    // (insertion) add transient Repo services to the container for DI in program.cs
     // write unit tests for controllers
     // create test project (consider a 3rd area - front, back, tests)
     // (insertion) add db sets to dbCtx
@@ -23,7 +22,7 @@ public static class BackEnd
 
   private static async Task<string> GenerateCode(string filePath, string fileType, bool overwrite = true)
   {
-    switch (TestPath(_userInput.ProjPath, filePath))
+    switch (Util.TestPath(_userInput.ProjPath, filePath))
     {
       case 0: await PSCmd.RunPowerShell(_userInput.ProjPath, $"mkdir {filePath}"); break;
       case 1: break;
@@ -37,6 +36,7 @@ public static class BackEnd
       List<string> props = [];
       List<string> mockData = [];
       List<string> dbCtxMockData = [];
+      string model = _userInput.Models[i];
 
       for (int j = 0; j < _userInput.Properties[i].Count; j++)
       {
@@ -48,14 +48,16 @@ public static class BackEnd
         }
       }
       props.Add($"{br}}}'");
-      props.Add($"> {_userInput.Models[i]}.cs");
+      props.Add($"> {model}.cs");
 
       switch (fileType)
       {
-        case "model class": await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.ModelClassHeader(_userInput.Models[i]).Concat(props).ToArray()); break;
-        case "repo interface": await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.RepoInterface(_userInput.Models[i])); break;
-        case "repository": await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.Repository(_userInput.Models[i])); break;
-        case "unit test": await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.UnitTest(_userInput.Models[i], mockData.ToArray(), dbCtxMockData.ToArray())); break;
+        case "model class": await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.ModelClassHeader(model).Concat(props).ToArray()); break;
+        case "repo interface": await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.RepoInterface(model)); break;
+        case "repository": await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.Repository(model));
+                           await Util.InsertCode(_userInput.ProjPath, BackEndTemplates.DiRepoService(model), "program.cs");
+                           await CheckProgramCsForNamespaces(); break;
+        case "unit test": await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.UnitTest(model, mockData.ToArray(), dbCtxMockData.ToArray())); break;
       }
     }
 
@@ -74,10 +76,21 @@ public static class BackEnd
     };
   }
 
-  private static int TestPath(string currentPathToTestFrom, string pathToTest) // consider putting a single TestPath method somewhere
+  private static async Task CheckProgramCsForNamespaces()
   {
-    var bufferedCmd = PSCmd.RunPowerShell(currentPathToTestFrom, $"Test-Path -Path {pathToTest}");
-    if (bufferedCmd.Result == null) { return -1; }
-    return (bufferedCmd.Result.StandardOutput == "True\r\n") ? 1 : 0;
+    string namespace0 = $"using {_userInput.ProjName}.Data.RepoInterfaces;{br}";
+    string namespace1 = $"using {_userInput.ProjName}.Data.Models;{br}";
+    string programCsText = await Util.ExtractFileText(_userInput.ProjPath, "program.cs");
+
+    if (programCsText.Contains(namespace0) == false)
+    {
+      string finalOutput = Util.PartitionCodeFile(namespace0 +  programCsText);
+      await PSCmd.RunPowerShellBatch(_userInput.ProjPath, Util.CreateTemplateFormat(finalOutput, "program.cs"));
+    }
+    if (programCsText.Contains(namespace1) == false)
+    {
+      string finalOutput = Util.PartitionCodeFile(namespace1 + programCsText);
+      await PSCmd.RunPowerShellBatch(_userInput.ProjPath, Util.CreateTemplateFormat(finalOutput, "program.cs"));
+    }
   }
 }

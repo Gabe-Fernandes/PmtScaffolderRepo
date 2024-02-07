@@ -5,6 +5,7 @@ namespace PmtScaffolder;
 public static class FrontEndTemplates
 {
   private static readonly string br = Environment.NewLine;
+  private static readonly string tab = "PMT_TAB";
   private static readonly UserInput _userInput = UserInput.GetUserInput();
 
   public static string[] SassFile(string fileName)
@@ -54,6 +55,7 @@ public static class FrontEndTemplates
             $"{br}[Authorize]",
             $"{br}public class {controllerName}Controller : Controller",
             $"{br}{{",
+              $"{br}\t// PMT Landmark",
               $"{br}\t",
             $"{br}}}'",
 
@@ -98,6 +100,11 @@ public static class FrontEndTemplates
 
   public static string CssLinkEle(string fileName)
   {
-    return $"{br}PMT_TAB<link rel=\"stylesheet\" href=\"~/css/{fileName}.css\" asp-append-version=\"true\" />";
+    return $"{br}{tab}<link rel=\"stylesheet\" href=\"~/css/{fileName}.css\" asp-append-version=\"true\" />";
+  }
+
+  public static string ControllerGetMethod(string viewName)
+  {
+    return $"{br}{tab}public async Task<IActionResult> {viewName}(){br}{tab}{{{br}{tab}{tab}return View();{br}{tab}}}{br}";
   }
 }

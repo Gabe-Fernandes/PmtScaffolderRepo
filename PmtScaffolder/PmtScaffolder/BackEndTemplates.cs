@@ -188,4 +188,9 @@ public static class BackEndTemplates
       Concat(unitTestPart3).Concat(mockData).
       Concat(unitTestPart4).ToArray();
   }
+
+  public static string DiRepoService(string modelName)
+  {
+    return $"{br}builder.Services.AddTransient<I{modelName}Repo, {modelName}Repo>();";
+  }
 }

@@ -161,9 +161,21 @@ public static class Cmd
     }
   }
 
+  private static void PrintModels()
+  {
+    for (int i = 0; i < _userInput.Models.Count; i++)
+    {
+      Console.WriteLine($"{_userInput.Models[i]}:");
+      for (int j = 0; j < _userInput.Properties.Count; j++)
+      {
+        Console.WriteLine($"-- {_userInput.DataTypes[i][j]} {_userInput.Properties[i][j]}");
+      }
+    }
+  }
+
   private static void PrintArgs()
   {
-    Console.WriteLine("\n===== Scaffold Arguments =====");
+    Console.WriteLine("\n==================== Scaffold Arguments ====================");
     Console.Write("\nProject Name: ");
     Console.WriteLine(_userInput.ProjName);
     Console.Write("\nProject Path: ");
@@ -172,16 +184,13 @@ public static class Cmd
     Console.WriteLine(_userInput.TestProjName);
     Console.Write("\nTest Project Path: ");
     Console.WriteLine(_userInput.TestProjPath);
-    Console.WriteLine("\nControllers:");
+    Console.WriteLine("\n============================================================\n");
+    Console.WriteLine("===== Controllers =====");
     PrintCollection(_userInput.Controllers);
-    Console.WriteLine("\nFile Names:");
+    Console.WriteLine("\n===== File Names =====");
     Print2DCollection(_userInput.FileNames);
-    Console.WriteLine("Models:");
-    PrintCollection(_userInput.Models);
-    Console.WriteLine("\nData Types:");
-    Print2DCollection(_userInput.DataTypes);
-    Console.WriteLine("Properties:");
-    Print2DCollection(_userInput.Properties);
-    Console.WriteLine("===== ___ =====\n");
+    Console.WriteLine("\n========================== Models ==========================\n");
+    PrintModels();
+    Console.WriteLine("\n============================================================\n");
   }
 }
