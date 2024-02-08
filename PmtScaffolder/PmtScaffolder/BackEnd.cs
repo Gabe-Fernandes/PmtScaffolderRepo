@@ -1,4 +1,6 @@
-﻿namespace PmtScaffolder;
+﻿using Humanizer;
+
+namespace PmtScaffolder;
 
 public static class BackEnd
 {
@@ -9,15 +11,13 @@ public static class BackEnd
 
   public static async Task ScaffoldBackEndCode()
   {
-    Console.WriteLine(await GenerateCode(_userInput.ProjPath + "/Data", "db ctx"));
+    await PSCmd.RunPowerShellBatch(_userInput.ProjPath + "/Data", BackEndTemplates.AppDbCtx());
     Console.WriteLine(await GenerateCode(_userInput.ProjPath + "/Data/Models", "model class"));
     Console.WriteLine(await GenerateCode(_userInput.ProjPath + "/Data/RepoInterfaces", "repo interface"));
     Console.WriteLine(await GenerateCode(_userInput.ProjPath + "/Data/Repos", "repository"));
     Console.WriteLine(await GenerateCode(_userInput.TestProjPath + "/Data/Repos", "unit test"));
     // write unit tests for controllers
     // create test project (consider a 3rd area - front, back, tests)
-    // (insertion) add db sets to dbCtx
-    // create dbctx
     // AppUser edge case with unit tests
   }
 
@@ -53,13 +53,13 @@ public static class BackEnd
 
       switch (fileType)
       {
-        case "model class": await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.ModelClassHeader(model).Concat(props).ToArray()); break;
+        case "model class": await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.ModelClassHeader(model).Concat(props).ToArray());
+                            await Util.InsertCode(_userInput.ProjPath + "/Data", BackEndTemplates.DbSet(model, model.Pluralize()), "AppDbContext.cs"); break;
         case "repo interface": await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.RepoInterface(model)); break;
         case "repository": await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.Repository(model));
                            await Util.InsertCode(_userInput.ProjPath, BackEndTemplates.DiRepoService(model), "program.cs");
                            await CheckProgramCsForNamespaces(); break;
         case "unit test": await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.UnitTest(model, mockData.ToArray(), dbCtxMockData.ToArray())); break;
-        case "db ctx": await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.AppDbCtx()); break;
       }
     }
 

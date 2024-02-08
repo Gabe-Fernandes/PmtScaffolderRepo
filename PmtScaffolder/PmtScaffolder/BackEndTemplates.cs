@@ -226,4 +226,9 @@ public static class BackEndTemplates
   {
     return $"{br}builder.Services.AddTransient<I{modelName}Repo, {modelName}Repo>();";
   }
+
+  public static string DbSet(string singularModelName, string pluralModelName)
+  {
+    return $"{br}\tpublic DbSet<{singularModelName}> {pluralModelName} {{ get; set; }}";
+  }
 }
