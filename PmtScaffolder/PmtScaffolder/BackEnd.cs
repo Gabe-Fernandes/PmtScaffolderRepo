@@ -1,5 +1,4 @@
 ﻿using Humanizer;
-using System.Reflection;
 
 namespace PmtScaffolder;
 
@@ -19,8 +18,14 @@ public static class BackEnd
     Console.WriteLine(await GenerateCode(_userInput.TestProjPath + "/Data/Repos", "unit test"));
     // write unit tests for controllers
     // create test project (consider a 3rd area - front, back, tests)
+
     // AppUser edge case with unit tests
+    // AppUser edge case for db ctx
+    // AppUser edge case for repo
+    // AppUser edge case for Irepo
+
     // add pluralization to unit tests
+    // add pluralization to repos
     // add capitalization where appropriate
   }
 
@@ -52,13 +57,24 @@ public static class BackEnd
 
       switch (fileType)
       {
-        case "model class": await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.ModelClassHeader(model).Concat(GetProperties(i)).ToArray());
-                            await Util.InsertCode(_userInput.ProjPath + "/Data", BackEndTemplates.DbSet(model, model.Pluralize()), "AppDbContext.cs"); break;
-        case "repo interface": await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.RepoInterface(model)); break;
-        case "repository": await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.Repository(model));
-                           await Util.InsertCode(_userInput.ProjPath, BackEndTemplates.DiRepoService(model), "program.cs");
-                           await CheckProgramCsForNamespaces(); break;
-        case "unit test": await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.UnitTest(model, mockData.ToArray(), dbCtxMockData.ToArray())); break;
+        case "model class":
+          await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.ModelClassHeader(model).Concat(GetProperties(i)).ToArray());
+          if (model != "AppUser")
+          {
+            await Util.InsertCode(_userInput.ProjPath + "/Data", BackEndTemplates.DbSet(model, model.Pluralize()), "AppDbContext.cs");
+          }
+          break;
+        case "repo interface":
+          await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.RepoInterface(model));
+          break;
+        case "repository": 
+          await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.Repository(model, model.Pluralize()));
+          await Util.InsertCode(_userInput.ProjPath, BackEndTemplates.DiRepoService(model), "program.cs");
+          await CheckProgramCsForNamespaces();
+          break;
+        case "unit test":
+          await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.UnitTest(model, mockData.ToArray(), dbCtxMockData.ToArray()));
+          break;
       }
     }
 

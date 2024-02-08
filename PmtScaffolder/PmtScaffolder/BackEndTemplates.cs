@@ -7,7 +7,7 @@ public static class BackEndTemplates
 
   public static string[] ModelClassHeader(string fileName)
   {
-    if (fileName == "AppUser")
+    if (fileName.ToLower() == "appuser")
     {
       return [$"Write-Output 'using Microsoft.AspNetCore.Identity;",
               $"{br}using System.ComponentModel.DataAnnotations;", br,
@@ -27,13 +27,15 @@ public static class BackEndTemplates
 
   public static string[] RepoInterface(string fileName)
   {
+    string idDataType = (fileName.ToLower() == "appuser") ? "string" : "int";
+
     return [$"Write-Output 'using {_userInput.ProjName}.Data.Models;", br,
 
             $"{br}namespace {_userInput.ProjName}.Data.RepoInterfaces;", br,
 
             $"{br}public interface I{fileName}Repo",
             $"{br}{{",
-              $"{br}\tTask<{fileName}> GetByIdAsync(int id);",
+              $"{br}\tTask<{fileName}> GetByIdAsync({idDataType} id);",
               $"{br}\tbool Add({fileName} {fileName});",
               $"{br}\tbool Update({fileName} {fileName});",
               $"{br}\tbool Delete({fileName} {fileName});",
@@ -43,8 +45,16 @@ public static class BackEndTemplates
             $"'> I{fileName}Repo.cs"];
   }
 
-  public static string[] Repository(string fileName)
+  public static string[] Repository(string fileName, string pluralName)
   {
+    string idDataType = "int";
+
+    if (fileName.ToLower() == "appuser")
+    {
+      idDataType = "string";
+      pluralName = "Users";
+    }
+
     return [$"Write-Output 'using Microsoft.EntityFrameworkCore;",
             $"{br}using {_userInput.ProjName}.Data.RepoInterfaces;", br,
 
@@ -56,19 +66,19 @@ public static class BackEndTemplates
 
               $"{br}\tpublic bool Add({fileName} {fileName})",
               $"{br}\t{{",
-                $"{br}\t\t_db.{fileName}s.Add({fileName});",
+                $"{br}\t\t_db.{pluralName}.Add({fileName});",
                 $"{br}\t\treturn Save();",
               $"{br}\t}}", br,
 
               $"{br}\tpublic bool Update({fileName} {fileName})",
               $"{br}\t{{",
-                $"{br}\t\t_db.{fileName}s.Update({fileName});",
+                $"{br}\t\t_db.{pluralName}.Update({fileName});",
                 $"{br}\t\treturn Save();",
               $"{br}\t}}", br,
 
               $"{br}\tpublic bool Delete({fileName} {fileName})",
               $"{br}\t{{",
-                $"{br}\t\t_db.{fileName}s.Remove({fileName});",
+                $"{br}\t\t_db.{pluralName}.Remove({fileName});",
                 $"{br}\t\treturn Save();",
               $"{br}\t}}", br,
 
@@ -78,9 +88,9 @@ public static class BackEndTemplates
                 $"{br}\t\treturn numSaved > 0;",
               $"{br}\t}}", br,
 
-              $"{br}\tTask<{fileName}> GetByIdAsync(int id)",
+              $"{br}\tpublic async Task<{fileName}> GetByIdAsync({idDataType} id)",
               $"{br}\t{{",
-                $"{br}\t\treturn await _db.{fileName}s.FindAsync(id);",
+                $"{br}\t\treturn await _db.{pluralName}.FindAsync(id);",
               $"{br}\t}}",
             $"{br}}}",
 
