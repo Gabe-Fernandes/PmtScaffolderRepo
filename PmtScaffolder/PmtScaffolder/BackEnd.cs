@@ -18,14 +18,6 @@ public static class BackEnd
     Console.WriteLine(await GenerateCode(_userInput.TestProjPath + "/Data/Repos", "unit test"));
     // write unit tests for controllers
     // create test project (consider a 3rd area - front, back, tests)
-
-    // AppUser edge case with unit tests
-    // AppUser edge case for db ctx
-    // AppUser edge case for repo
-    // AppUser edge case for Irepo
-
-    // add pluralization to unit tests
-    // add pluralization to repos
     // add capitalization where appropriate
   }
 
@@ -73,7 +65,7 @@ public static class BackEnd
           await CheckProgramCsForNamespaces();
           break;
         case "unit test":
-          await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.UnitTest(model, mockData.ToArray(), dbCtxMockData.ToArray()));
+          await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.UnitTest(model, model.Pluralize(), mockData.ToArray(), dbCtxMockData.ToArray()));
           break;
       }
     }

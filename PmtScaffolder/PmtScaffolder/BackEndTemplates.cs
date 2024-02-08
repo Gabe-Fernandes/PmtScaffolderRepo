@@ -127,8 +127,18 @@ public static class BackEndTemplates
             $"'> AppDbContext.cs"];
   }
 
-  public static string[] UnitTest(string fileName, string[] mockData, string[] dbCtxMockData)
+  public static string[] UnitTest(string fileName, string pluralName, string[] mockData, string[] dbCtxMockData)
   {
+    string idInstantiation = "Id = (i + 1),";
+    string arrangedId = "2";
+
+    if (fileName.ToLower() == "appuser")
+    {
+      idInstantiation = "Id = (i + 1).ToString(),";
+      pluralName = "Users";
+      arrangedId = "\"2\"";
+    }
+
     string[] unitTestPart0 = [$"Write-Output 'using Microsoft.EntityFrameworkCore;",
             $"{br}using {_userInput.ProjName}.Data.Models;",
             $"{br}using {_userInput.ProjName}.Data;", br,
@@ -154,13 +164,13 @@ public static class BackEndTemplates
                 $"{br}\t\t\t.UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()).Options;",
                 $"{br}\t\tvar dbContext = new AppDbContext(options);",
                 $"{br}\t\tdbContext.Database.EnsureCreated();",
-                $"{br}\t\tif (dbContext.{fileName}s.Count() < 0)",
+                $"{br}\t\tif (dbContext.{pluralName}.Count() < 0)",
                 $"{br}\t\t{{",
                   $"{br}\t\t\tfor (int i = 0; i < 10; i++)",
                   $"{br}\t\t\t{{",
-                    $"{br}\t\t\t\tdbContext.{fileName}s.Add(new {fileName}()",
+                    $"{br}\t\t\t\tdbContext.{pluralName}.Add(new {fileName}()",
                     $"{br}\t\t\t\t{{",
-                      $"{br}\t\t\t\t\tId = (i + 1),"];
+                      $"{br}\t\t\t\t\t{idInstantiation}"];
     string[] unitTestPart1 = [
                     $"{br}\t\t\t\t}});",
                     $"{br}\t\t\t\tdbContext.SaveChangesAsync();",
@@ -225,7 +235,7 @@ public static class BackEndTemplates
               $"{br}\tpublic async void GetByIdAsync_Returns{fileName}Task()",
               $"{br}\t{{",
                 $"{br}\t\t// Arrange",
-                $"{br}\t\tvar id = 2;",
+                $"{br}\t\tvar id = {arrangedId};",
                 $"{br}\t\t// Act",
                 $"{br}\t\tvar result = await _{fileName}Repo.GetByIdAsync(id);",
                 $"{br}\t\t// Assert",
