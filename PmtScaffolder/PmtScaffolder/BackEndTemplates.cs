@@ -7,6 +7,16 @@ public static class BackEndTemplates
 
   public static string[] ModelClassHeader(string fileName)
   {
+    if (fileName == "AppUser")
+    {
+      return [$"Write-Output 'using Microsoft.AspNetCore.Identity;",
+              $"{br}using System.ComponentModel.DataAnnotations;", br,
+
+              $"{br}namespace {_userInput.ProjName}.Data.Models;", br,
+
+              $"{br}public class {fileName} : IdentityUser",
+              $"{br}{{"];
+    }
     return [$"Write-Output 'using System.ComponentModel.DataAnnotations;", br,
 
             $"{br}namespace {_userInput.ProjName}.Data.Models;", br,

@@ -1,4 +1,5 @@
 ﻿using Humanizer;
+using System.Reflection;
 
 namespace PmtScaffolder;
 
@@ -19,6 +20,8 @@ public static class BackEnd
     // write unit tests for controllers
     // create test project (consider a 3rd area - front, back, tests)
     // AppUser edge case with unit tests
+    // add pluralization to unit tests
+    // add capitalization where appropriate
   }
 
   private static async Task<string> GenerateCode(string filePath, string fileType, bool overwrite = true)
@@ -34,26 +37,22 @@ public static class BackEnd
 
     for (int i = 0; i < _userInput.Models.Count; i++)
     {
-      List<string> props = [];
       List<string> mockData = [];
       List<string> dbCtxMockData = [];
       string model = _userInput.Models[i];
 
       for (int j = 0; j < _userInput.Properties[i].Count; j++)
       {
-        props.Add($"{br}\tpublic {_userInput.DataTypes[i][j]} {_userInput.Properties[i][j]} {{ get; set; }}");
         mockData.Add($"{br}\t\t{_userInput.Properties[i][j]} = {GetUnitTestMockData(_userInput.DataTypes[i][j])},");
         if (_userInput.Properties[i][j] != "Id") // Id is hardcoded in the template
         {
           dbCtxMockData.Add($"{br}\t\t\t\t\t{_userInput.Properties[i][j]} = {GetUnitTestMockData(_userInput.DataTypes[i][j])},");
         }
       }
-      props.Add($"{br}}}'");
-      props.Add($"> {model}.cs");
 
       switch (fileType)
       {
-        case "model class": await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.ModelClassHeader(model).Concat(props).ToArray());
+        case "model class": await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.ModelClassHeader(model).Concat(GetProperties(i)).ToArray());
                             await Util.InsertCode(_userInput.ProjPath + "/Data", BackEndTemplates.DbSet(model, model.Pluralize()), "AppDbContext.cs"); break;
         case "repo interface": await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.RepoInterface(model)); break;
         case "repository": await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.Repository(model));
@@ -76,6 +75,20 @@ public static class BackEnd
       "DateTime" => "DateTime.Now",
       _ => "ERROR",
     };
+  }
+
+  private static List<string> GetProperties(int modelIndex)
+  {
+    List<string> props = [];
+
+    for (int j = 0; j < _userInput.Properties[modelIndex].Count; j++)
+    {
+      props.Add($"{br}\tpublic {_userInput.DataTypes[modelIndex][j]} {_userInput.Properties[modelIndex][j]} {{ get; set; }}");
+    }
+    props.Add($"{br}}}'");
+    props.Add($"> {_userInput.Models[modelIndex]}.cs");
+
+    return props;
   }
 
   private static async Task CheckProgramCsForNamespaces()
