@@ -73,7 +73,7 @@ public static class FrontEnd
 
   private static async Task GenerateControllerDir(string filePath, int i, string fileType)
   {
-    await PSCmd.RunPowerShell(filePath, $"mkdir {_userInput.Controllers[i]}");
+    await PSCmd.RunPowerShell(filePath, $"mkdir {Util.Capital(_userInput.Controllers[i], true)}");
 
     if (fileType == "cshtml")
     {

@@ -1,4 +1,5 @@
 ﻿using Humanizer;
+using System.Reflection;
 
 namespace PmtScaffolder;
 
@@ -16,8 +17,6 @@ public static class BackEnd
     Console.WriteLine(await GenerateCode(_userInput.ProjPath + "/Data/RepoInterfaces", "repo interface"));
     Console.WriteLine(await GenerateCode(_userInput.ProjPath + "/Data/Repos", "repository"));
     Console.WriteLine(await GenerateCode(_userInput.TestProjPath + "/Data/Repos", "unit test"));
-    // write unit tests for controllers
-    // create test project (consider a 3rd area - front, back, tests)
     // add capitalization where appropriate
   }
 
@@ -40,10 +39,13 @@ public static class BackEnd
 
       for (int j = 0; j < _userInput.Properties[i].Count; j++)
       {
-        mockData.Add($"{br}\t\t{_userInput.Properties[i][j]} = {GetUnitTestMockData(_userInput.DataTypes[i][j])},");
-        if (_userInput.Properties[i][j] != "Id") // Id is hardcoded in the template
+        string property = Util.Capital(_userInput.Properties[i][j], true);
+
+        mockData.Add($"{br}\t\t{property} = {GetUnitTestMockData(_userInput.DataTypes[i][j])},");
+
+        if (_userInput.Properties[i][j].ToLower() != "id") // Id is hardcoded in the template
         {
-          dbCtxMockData.Add($"{br}\t\t\t\t\t{_userInput.Properties[i][j]} = {GetUnitTestMockData(_userInput.DataTypes[i][j])},");
+          dbCtxMockData.Add($"{br}\t\t\t\t\t{property} = {GetUnitTestMockData(_userInput.DataTypes[i][j])},");
         }
       }
 
@@ -60,9 +62,8 @@ public static class BackEnd
           await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.RepoInterface(model));
           break;
         case "repository": 
-          await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.Repository(model, model.Pluralize()));
-          await Util.InsertCode(_userInput.ProjPath, BackEndTemplates.DiRepoService(model), "program.cs");
-          await CheckProgramCsForNamespaces();
+          await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.Repository(model, model.Pluralize()));          
+          await CheckProgramCsForNamespaces(model);
           break;
         case "unit test":
           await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.UnitTest(model, model.Pluralize(), mockData.ToArray(), dbCtxMockData.ToArray()));
@@ -91,20 +92,28 @@ public static class BackEnd
 
     for (int j = 0; j < _userInput.Properties[modelIndex].Count; j++)
     {
-      props.Add($"{br}\tpublic {_userInput.DataTypes[modelIndex][j]} {_userInput.Properties[modelIndex][j]} {{ get; set; }}");
+      // don't run this for the id property of AppUsers - if this is needed for all default AppUser props, the structure may change
+      if (_userInput.Properties[modelIndex][j].ToLower() != "id" || _userInput.Models[modelIndex].ToLower() != "appuser")
+      {
+        props.Add($"{br}\tpublic {_userInput.DataTypes[modelIndex][j]} {Util.Capital(_userInput.Properties[modelIndex][j], true)} {{ get; set; }}");
+      }
     }
     props.Add($"{br}}}'");
-    props.Add($"> {_userInput.Models[modelIndex]}.cs");
+    props.Add($"> {Util.Capital(_userInput.Models[modelIndex], true)}.cs");
 
     return props;
   }
 
-  private static async Task CheckProgramCsForNamespaces()
+  private static async Task CheckProgramCsForNamespaces(string model)
   {
     string namespace0 = $"using {_userInput.ProjName}.Data.RepoInterfaces;{br}";
     string namespace1 = $"using {_userInput.ProjName}.Data.Models;{br}";
     string programCsText = await Util.ExtractFileText(_userInput.ProjPath, "program.cs");
 
+    if (programCsText.Contains(BackEndTemplates.DiRepoService(model)) == false)
+    {
+      await Util.InsertCode(_userInput.ProjPath, BackEndTemplates.DiRepoService(model), "program.cs");
+    }
     if (programCsText.Contains(namespace0) == false)
     {
       string finalOutput = Util.PartitionCodeFile(namespace0 +  programCsText);

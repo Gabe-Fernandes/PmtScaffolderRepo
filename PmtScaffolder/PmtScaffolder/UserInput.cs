@@ -9,12 +9,12 @@ public class UserInput
   public string ProjName { get; set; } = "AutoGen";
   public string TestProjName { get; set; } = "AutoGenTests";
 
-  public List<string> Controllers = ["Agile", "MyProjects"];
-  public List<List<string>> FileNames = [["one", "two", "three"], ["four", "five", "six"]];
+  public List<string> Controllers = ["agile", "MyProjects"];
+  public List<List<string>> FileNames = [["one", "Two", "three"], ["four", "five", "Six"]];
 
-  public List<string> Models = ["Story", "Project", "AppUser"];
+  public List<string> Models = ["story", "Project", "appUser"];
   public List<List<string>> DataTypes = [["int", "string", "string"], ["int", "string", "DateTime"], ["string", "string", "int", "DateTime"]];
-  public List<List<string>> Properties = [["Id", "Title", "Description"], ["Id", "Name", "DueDate"], ["Id", "name", "age", "dob"]];
+  public List<List<string>> Properties = [["id", "Title", "Description"], ["Id", "name", "dueDate"], ["Id", "name", "age", "dob"]];
 
   private UserInput() { }
 

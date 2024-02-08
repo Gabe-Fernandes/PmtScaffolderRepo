@@ -10,6 +10,8 @@ public static class FrontEndTemplates
 
   public static string[] SassFile(string fileName)
   {
+    fileName = Util.Capital(fileName, false);
+
     return [$@"Write-Output '@import ""../_library.scss"";", br,
 
             $"{br}#{fileName}Content {{",
@@ -21,6 +23,8 @@ public static class FrontEndTemplates
 
   public static string[] JsFile(string fileName)
   {
+    fileName = Util.Capital(fileName, false);
+
     return [$"Write-Output '$(function () {{",
               $"{br}\t",
             $"{br}}});",
@@ -30,13 +34,16 @@ public static class FrontEndTemplates
 
   public static string[] CsHtmlFile(string fileName, string controllerName)
   {
+    fileName = Util.Capital(fileName, true);
+    controllerName = Util.Capital(controllerName, true);
+
     return [$"Write-Output '@{{",
             $@"{br}  ViewData[""Title""] = ""{fileName}"";",
             $"{br}}}", br,
 
-            $@"{br}<script type=""text/javascript"" src=""~/js/{controllerName}/{fileName}.js""></script>", br,
+            $@"{br}<script type=""text/javascript"" src=""~/js/{controllerName}/{Util.Capital(fileName, false)}.js""></script>", br,
 
-            $@"{br}<section id=""{fileName}Content"">",
+            $@"{br}<section id=""{Util.Capital(fileName, false)}Content"">",
               $"{br}\t",
             $"{br}</section>",
 
@@ -45,6 +52,8 @@ public static class FrontEndTemplates
 
   public static string[] ControllerFile(string controllerName)
   {
+    controllerName = Util.Capital(controllerName, true);
+
     return [$"Write-Output 'using Microsoft.AspNetCore.Authorization;",
             $"{br}using Microsoft.AspNetCore.Mvc;",
             $"{br}using {_userInput.ProjName}.Data.Models;",
@@ -64,6 +73,8 @@ public static class FrontEndTemplates
 
   public static string[] ViewStartFile(string controllerName)
   {
+    controllerName = Util.Capital(controllerName, true);
+
     return [$"Write-Output '@{{",
             $@"{br}  Layout = ""_{controllerName}_Layout"";",
             $"{br}}}",
@@ -73,6 +84,8 @@ public static class FrontEndTemplates
 
   public static string[] LayoutFile(string controllerName)
   {
+    controllerName = Util.Capital(controllerName, true);
+
     return [$"Write-Output '<!DOCTYPE html>",
             $@"{br}<html lang=""en"">",
             $"{br}<head>",
@@ -100,11 +113,11 @@ public static class FrontEndTemplates
 
   public static string CssLinkEle(string fileName)
   {
-    return $"{br}{tab}<link rel=\"stylesheet\" href=\"~/css/{fileName}.css\" asp-append-version=\"true\" />";
+    return $"{br}{tab}<link rel=\"stylesheet\" href=\"~/css/{Util.Capital(fileName, false)}.css\" asp-append-version=\"true\" />";
   }
 
   public static string ControllerGetMethod(string viewName)
   {
-    return $"{br}{tab}public async Task<IActionResult> {viewName}(){br}{tab}{{{br}{tab}{tab}return View();{br}{tab}}}{br}";
+    return $"{br}{tab}public async Task<IActionResult> {Util.Capital(viewName, true)}(){br}{tab}{{{br}{tab}{tab}return View();{br}{tab}}}{br}";
   }
 }

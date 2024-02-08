@@ -13,6 +13,17 @@ public static class Util
 
 
 
+  public static string Capital(string text, bool firstLetterCapitalized)
+  {
+    if (firstLetterCapitalized)
+    {
+      return text.Substring(0, 1).ToUpper() + text.Substring(1);
+    }
+    return text.Substring(0, 1).ToLower() + text.Substring(1);
+  }
+
+
+
   public static async Task InsertCode(string parentPath, string codeToInsert, string fileNameWithExtension, bool htmlLandmark = false)
   {
     string fileText = await ExtractFileText(parentPath, fileNameWithExtension);

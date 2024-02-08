@@ -7,6 +7,8 @@ public static class BackEndTemplates
 
   public static string[] ModelClassHeader(string fileName)
   {
+    fileName = Util.Capital(fileName, true);
+
     if (fileName.ToLower() == "appuser")
     {
       return [$"Write-Output 'using Microsoft.AspNetCore.Identity;",
@@ -27,6 +29,8 @@ public static class BackEndTemplates
 
   public static string[] RepoInterface(string fileName)
   {
+    fileName = Util.Capital(fileName, true);
+    string lowerCaseFileName = Util.Capital(fileName, false);
     string idDataType = (fileName.ToLower() == "appuser") ? "string" : "int";
 
     return [$"Write-Output 'using {_userInput.ProjName}.Data.Models;", br,
@@ -36,9 +40,9 @@ public static class BackEndTemplates
             $"{br}public interface I{fileName}Repo",
             $"{br}{{",
               $"{br}\tTask<{fileName}> GetByIdAsync({idDataType} id);",
-              $"{br}\tbool Add({fileName} {fileName});",
-              $"{br}\tbool Update({fileName} {fileName});",
-              $"{br}\tbool Delete({fileName} {fileName});",
+              $"{br}\tbool Add({fileName} {lowerCaseFileName});",
+              $"{br}\tbool Update({fileName} {lowerCaseFileName});",
+              $"{br}\tbool Delete({fileName} {lowerCaseFileName});",
               $"{br}\tbool Save();",
             $"{br}}}",
 
@@ -47,6 +51,9 @@ public static class BackEndTemplates
 
   public static string[] Repository(string fileName, string pluralName)
   {
+    fileName = Util.Capital(fileName, true);
+    pluralName = Util.Capital(pluralName, true);
+    string lowerCaseFileName = Util.Capital(fileName, false);
     string idDataType = "int";
 
     if (fileName.ToLower() == "appuser")
@@ -64,21 +71,21 @@ public static class BackEndTemplates
             $"{br}{{",
               $"{br}\tprivate readonly AppDbContext _db = db;", br,
 
-              $"{br}\tpublic bool Add({fileName} {fileName})",
+              $"{br}\tpublic bool Add({fileName} {lowerCaseFileName})",
               $"{br}\t{{",
-                $"{br}\t\t_db.{pluralName}.Add({fileName});",
+                $"{br}\t\t_db.{pluralName}.Add({lowerCaseFileName});",
                 $"{br}\t\treturn Save();",
               $"{br}\t}}", br,
 
-              $"{br}\tpublic bool Update({fileName} {fileName})",
+              $"{br}\tpublic bool Update({fileName} {lowerCaseFileName})",
               $"{br}\t{{",
-                $"{br}\t\t_db.{pluralName}.Update({fileName});",
+                $"{br}\t\t_db.{pluralName}.Update({lowerCaseFileName});",
                 $"{br}\t\treturn Save();",
               $"{br}\t}}", br,
 
-              $"{br}\tpublic bool Delete({fileName} {fileName})",
+              $"{br}\tpublic bool Delete({fileName} {lowerCaseFileName})",
               $"{br}\t{{",
-                $"{br}\t\t_db.{pluralName}.Remove({fileName});",
+                $"{br}\t\t_db.{pluralName}.Remove({lowerCaseFileName});",
                 $"{br}\t\treturn Save();",
               $"{br}\t}}", br,
 
@@ -129,6 +136,9 @@ public static class BackEndTemplates
 
   public static string[] UnitTest(string fileName, string pluralName, string[] mockData, string[] dbCtxMockData)
   {
+    fileName = Util.Capital(fileName, true);
+    pluralName = Util.Capital(pluralName, true);
+    string lowerCaseFileName = Util.Capital(fileName, false);
     string idInstantiation = "Id = (i + 1),";
     string arrangedId = "2";
 
@@ -148,14 +158,14 @@ public static class BackEndTemplates
             $"{br}public class {fileName}RepoTests",
             $"{br}{{",
               $"{br}\tprivate readonly AppDbContext _dbContext;",
-              $"{br}\tprivate readonly {fileName}Repo _{fileName}Repo;", br,
+              $"{br}\tprivate readonly {fileName}Repo _{lowerCaseFileName}Repo;", br,
 
               $"{br}\tpublic {fileName}RepoTests()",
               $"{br}\t{{",
                 $"{br}\t\t// Dependencies",
                 $"{br}\t\t_dbContext = GetDbContext();",
                 $"{br}\t\t// SUT",
-                $"{br}\t\t_{fileName}Repo = new {fileName}Repo(_dbContext);",
+                $"{br}\t\t_{lowerCaseFileName}Repo = new {fileName}Repo(_dbContext);",
               $"{br}\t}}", br,
 
               $"{br}\tprivate AppDbContext GetDbContext()",
@@ -183,12 +193,12 @@ public static class BackEndTemplates
               $"{br}\tpublic void Add_ReturnsTrue()",
               $"{br}\t{{",
                 $"{br}\t\t// Arrange",
-                $"{br}\t\tvar {fileName} = new {fileName}()",
+                $"{br}\t\tvar {lowerCaseFileName} = new {fileName}()",
                 $"{br}\t\t{{"];
     string[] unitTestPart2 = [
                 $"{br}\t\t}};",
                 $"{br}\t\t// Act",
-                $"{br}\t\tvar result = _{fileName}Repo.Add({fileName});",
+                $"{br}\t\tvar result = _{lowerCaseFileName}Repo.Add({lowerCaseFileName});",
                 $"{br}\t\t// Assert",
                 $"{br}\t\tAssert.True(result);",
               $"{br}\t}}", br,
@@ -197,12 +207,12 @@ public static class BackEndTemplates
               $"{br}\tpublic void Delete_ReturnsTrue()",
               $"{br}\t{{",
                 $"{br}\t\t// Arrange",
-                $"{br}\t\tvar {fileName} = new {fileName}()",
+                $"{br}\t\tvar {lowerCaseFileName} = new {fileName}()",
                 $"{br}\t\t{{"];
     string[] unitTestPart3 = [
                 $"{br}\t\t}};",
                 $"{br}\t\t// Act",
-                $"{br}\t\tvar result = _{fileName}Repo.Delete({fileName});",
+                $"{br}\t\tvar result = _{lowerCaseFileName}Repo.Delete({lowerCaseFileName});",
                 $"{br}\t\t// Assert",
                 $"{br}\t\tAssert.True(result);",
               $"{br}\t}}", br,
@@ -211,12 +221,12 @@ public static class BackEndTemplates
               $"{br}\tpublic void Update_ReturnsTrue()",
               $"{br}\t{{",
                 $"{br}\t\t// Arrange",
-                $"{br}\t\tvar {fileName} = new {fileName}()",
+                $"{br}\t\tvar {lowerCaseFileName} = new {fileName}()",
                 $"{br}\t\t{{"];
     string[] unitTestPart4 = [
                 $"{br}\t\t}};",
                 $"{br}\t\t// Act",
-                $"{br}\t\tvar result = _{fileName}Repo.Update({fileName});",
+                $"{br}\t\tvar result = _{lowerCaseFileName}Repo.Update({lowerCaseFileName});",
                 $"{br}\t\t// Assert",
                 $"{br}\t\tAssert.True(result);",
               $"{br}\t}}", br,
@@ -226,7 +236,7 @@ public static class BackEndTemplates
               $"{br}\t{{",
                 $"{br}\t\t// Arrange (empty)",
                 $"{br}\t\t// Act",
-                $"{br}\t\tvar result = _{fileName}Repo.Save();",
+                $"{br}\t\tvar result = _{lowerCaseFileName}Repo.Save();",
                 $"{br}\t\t// Assert",
                 $"{br}\t\tAssert.IsType<bool>(result);",
               $"{br}\t}}", br,
@@ -237,7 +247,7 @@ public static class BackEndTemplates
                 $"{br}\t\t// Arrange",
                 $"{br}\t\tvar id = {arrangedId};",
                 $"{br}\t\t// Act",
-                $"{br}\t\tvar result = await _{fileName}Repo.GetByIdAsync(id);",
+                $"{br}\t\tvar result = await _{lowerCaseFileName}Repo.GetByIdAsync(id);",
                 $"{br}\t\t// Assert",
                 $"{br}\t\tawait Assert.IsType<Task<{fileName}>>(result);",
               $"{br}\t}}",
@@ -254,11 +264,14 @@ public static class BackEndTemplates
 
   public static string DiRepoService(string modelName)
   {
+    modelName = Util.Capital(modelName, true);
     return $"{br}builder.Services.AddTransient<I{modelName}Repo, {modelName}Repo>();";
   }
 
   public static string DbSet(string singularModelName, string pluralModelName)
   {
+    singularModelName = Util.Capital(singularModelName, true);
+    pluralModelName = Util.Capital(pluralModelName, true);
     return $"{br}\tpublic DbSet<{singularModelName}> {pluralModelName} {{ get; set; }}";
   }
 }
