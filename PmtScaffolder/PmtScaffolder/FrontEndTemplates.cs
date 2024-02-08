@@ -14,18 +14,18 @@ public static class FrontEndTemplates
 
             $"{br}#{fileName}Content {{",
               $"{br}\t",
-            $"{br}}}'",
+            $"{br}}}",
 
-            $"> {fileName}.scss"];
+            $"'> {fileName}.scss"];
   }
 
   public static string[] JsFile(string fileName)
   {
     return [$"Write-Output '$(function () {{",
               $"{br}\t",
-            $"{br}}});'",
+            $"{br}}});",
 
-            $"> {fileName}.js"];
+            $"'> {fileName}.js"];
   }
 
   public static string[] CsHtmlFile(string fileName, string controllerName)
@@ -38,9 +38,9 @@ public static class FrontEndTemplates
 
             $@"{br}<section id=""{fileName}Content"">",
               $"{br}\t",
-            $"{br}</section>'",
+            $"{br}</section>",
 
-            $"> {fileName}.cshtml"];
+            $"'> {fileName}.cshtml"];
   }
 
   public static string[] ControllerFile(string controllerName)
@@ -57,18 +57,18 @@ public static class FrontEndTemplates
             $"{br}{{",
               $"{br}\t// PMT Landmark",
               $"{br}\t",
-            $"{br}}}'",
+            $"{br}}}",
 
-            $"> {controllerName}Controller.cs"];
+            $"'> {controllerName}Controller.cs"];
   }
 
   public static string[] ViewStartFile(string controllerName)
   {
     return [$"Write-Output '@{{",
             $@"{br}  Layout = ""_{controllerName}_Layout"";",
-            $"{br}}}'",
+            $"{br}}}",
 
-            $"> _ViewStart.cshtml"];
+            $"'> _ViewStart.cshtml"];
   }
 
   public static string[] LayoutFile(string controllerName)
@@ -93,9 +93,9 @@ public static class FrontEndTemplates
               $"{br}\t\t@RenderBody()",
               $"{br}\t</main>",
               $"{br}</body>",
-              $"{br}</html>'",
+              $"{br}</html>",
 
-            $"> _{controllerName}_Layout.cshtml"];
+            $"'> _{controllerName}_Layout.cshtml"];
   }
 
   public static string CssLinkEle(string fileName)

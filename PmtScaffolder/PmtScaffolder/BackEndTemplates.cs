@@ -28,8 +28,9 @@ public static class BackEndTemplates
               $"{br}\tbool Update({fileName} {fileName});",
               $"{br}\tbool Delete({fileName} {fileName});",
               $"{br}\tbool Save();",
-            $"{br}}}'",
-            $"> I{fileName}Repo.cs"];
+            $"{br}}}",
+
+            $"'> I{fileName}Repo.cs"];
   }
 
   public static string[] Repository(string fileName)
@@ -71,8 +72,39 @@ public static class BackEndTemplates
               $"{br}\t{{",
                 $"{br}\t\treturn await _db.{fileName}s.FindAsync(id);",
               $"{br}\t}}",
-            $"{br}}}'",
-            $"> {fileName}Repo.cs"];
+            $"{br}}}",
+
+            $"'> {fileName}Repo.cs"];
+  }
+
+  public static string[] AppDbCtx()
+  {
+    return [$"Write-Output 'using Microsoft.AspNetCore.Identity.EntityFrameworkCore;",
+            $"{br}using Microsoft.EntityFrameworkCore;",
+            $"{br}using {_userInput.ProjName}.Data.Models;", br,
+
+            $"{br}namespace {_userInput.ProjName}.Data;", br,
+
+            $"{br}public class AppDbContext : IdentityDbContext<AppUser>",
+            $"{br}{{",
+              $"{br}\tpublic AppDbContext(DbContextOptions<AppDbContext> options) : base(options) {{ }}", br,
+
+              $"{br}\t// PMT Landmark", br,
+
+              $"{br}\tprotected override void OnModelCreating(ModelBuilder builder)",
+              $"{br}\t{{",
+              $"{br}\t\tbase.OnModelCreating(builder);", br,
+
+              $"{br}\t\tbuilder.Entity<AppUser>()",
+                $"{br}\t\t.Ignore(x => x.TwoFactorEnabled)",
+                $"{br}\t\t.Ignore(x => x.AccessFailedCount)",
+                $"{br}\t\t.Ignore(x => x.LockoutEnabled)",
+                $"{br}\t\t.Ignore(x => x.LockoutEnd)",
+                $"{br}\t\t.Ignore(x => x.PhoneNumberConfirmed);",
+              $"{br}\t}}",
+            $"{br}}}",
+
+            $"'> AppDbContext.cs"];
   }
 
   public static string[] UnitTest(string fileName, string[] mockData, string[] dbCtxMockData)
@@ -179,8 +211,9 @@ public static class BackEndTemplates
                 $"{br}\t\t// Assert",
                 $"{br}\t\tawait Assert.IsType<Task<{fileName}>>(result);",
               $"{br}\t}}",
-            $"{br}}}'",
-            $"> {fileName}RepoTests.cs"];
+            $"{br}}}",
+
+            $"'> {fileName}RepoTests.cs"];
 
     return unitTestPart0.Concat(dbCtxMockData)
       .Concat(unitTestPart1).Concat(mockData).
