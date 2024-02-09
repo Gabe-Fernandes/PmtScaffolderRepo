@@ -13,6 +13,25 @@ public static class Util
 
 
 
+  public static async Task InsertWithCheck(string lineToInsert, string pathToCheck, string fileNameWithExtension, bool insertAtTop = false)
+  {
+    string fileText = await ExtractFileText(pathToCheck, fileNameWithExtension);
+
+    // check if the line to insert already exists
+    if (fileText.Contains(lineToInsert) == false)
+    {
+      if (insertAtTop)
+      {
+        string finalOutput = PartitionCodeFile(lineToInsert + fileText);
+        await PSCmd.RunPowerShellBatch(pathToCheck, CreateTemplateFormat(finalOutput, fileNameWithExtension));
+        return;
+      }
+      await InsertCode(pathToCheck, lineToInsert, fileNameWithExtension);
+    }
+  }
+
+
+
   public static string Capital(string text, bool firstLetterCapitalized)
   {
     if (firstLetterCapitalized)

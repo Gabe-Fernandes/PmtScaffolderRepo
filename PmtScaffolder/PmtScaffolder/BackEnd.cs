@@ -58,8 +58,10 @@ public static class BackEnd
           await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.RepoInterface(model));
           break;
         case "repository": 
-          await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.Repository(model, model.Pluralize()));          
-          await CheckProgramCsForNamespaces(model);
+          await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.Repository(model, model.Pluralize()));
+          await Util.InsertWithCheck($"using {_userInput.ProjName}.Data.RepoInterfaces;{br}", _userInput.ProjPath, "program.cs", true);
+          await Util.InsertWithCheck($"using {_userInput.ProjName}.Data.Models;{br}", _userInput.ProjPath, "program.cs", true);
+          await Util.InsertWithCheck(BackEndTemplates.DiRepoService(model), _userInput.ProjPath, "program.cs");
           break;
         case "unit test":
           await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.UnitTest(model, model.Pluralize(), mockData.ToArray(), dbCtxMockData.ToArray()));
@@ -100,25 +102,25 @@ public static class BackEnd
     return props;
   }
 
-  private static async Task CheckProgramCsForNamespaces(string model)
-  {
-    string namespace0 = $"using {_userInput.ProjName}.Data.RepoInterfaces;{br}";
-    string namespace1 = $"using {_userInput.ProjName}.Data.Models;{br}";
-    string programCsText = await Util.ExtractFileText(_userInput.ProjPath, "program.cs");
+  //private static async Task CheckProgramCsForNamespaces(string model)
+  //{
+  //  string namespace0 = ;
+  //  string namespace1 = ;
+  //  string programCsText = await Util.ExtractFileText(_userInput.ProjPath, "program.cs");
 
-    if (programCsText.Contains(BackEndTemplates.DiRepoService(model)) == false)
-    {
-      await Util.InsertCode(_userInput.ProjPath, BackEndTemplates.DiRepoService(model), "program.cs");
-    }
-    if (programCsText.Contains(namespace0) == false)
-    {
-      string finalOutput = Util.PartitionCodeFile(namespace0 +  programCsText);
-      await PSCmd.RunPowerShellBatch(_userInput.ProjPath, Util.CreateTemplateFormat(finalOutput, "program.cs"));
-    }
-    if (programCsText.Contains(namespace1) == false)
-    {
-      string finalOutput = Util.PartitionCodeFile(namespace1 + programCsText);
-      await PSCmd.RunPowerShellBatch(_userInput.ProjPath, Util.CreateTemplateFormat(finalOutput, "program.cs"));
-    }
-  }
+  //  if (programCsText.Contains() == false)
+  //  {
+  //    await Util.InsertCode(_userInput.ProjPath, BackEndTemplates.DiRepoService(model), "program.cs");
+  //  }
+  //  if (programCsText.Contains(namespace0) == false)
+  //  {
+  //    string finalOutput = Util.PartitionCodeFile(namespace0 + programCsText);
+  //    await PSCmd.RunPowerShellBatch(_userInput.ProjPath, Util.CreateTemplateFormat(finalOutput, "program.cs"));
+  //  }
+  //  if (programCsText.Contains(namespace1) == false)
+  //  {
+  //    string finalOutput = Util.PartitionCodeFile(namespace1 + programCsText);
+  //    await PSCmd.RunPowerShellBatch(_userInput.ProjPath, Util.CreateTemplateFormat(finalOutput, "program.cs"));
+  //  }
+  //}
 }

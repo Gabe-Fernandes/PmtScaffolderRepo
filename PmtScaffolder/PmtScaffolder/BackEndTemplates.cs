@@ -24,7 +24,8 @@ public static class BackEndTemplates
             $"{br}namespace {_userInput.ProjName}.Data.Models;", br,
 
             $"{br}public class {fileName}",
-            $"{br}{{"];
+            $"{br}{{",
+            $"{br}\t[Key]"];
   }
 
   public static string[] RepoInterface(string fileName)
