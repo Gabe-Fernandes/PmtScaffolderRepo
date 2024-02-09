@@ -14,7 +14,10 @@ public static class FrontEnd
     Console.WriteLine(await GenerateCode(_userInput.ProjPath + "/Views", "cshtml"));
     // overwrite needs to check if files exist
     // insertions need to check if lines exist (definitely css links)
-    // validate pmt front
+    // have the app read a specific text file from the downloads folder, validate it, and scaffold
+    // have PMT package and download a text file
+    // register console app as a service
+    // deploy
   }
 
   private static async Task<string> GenerateCode(string filePath, string fileType, bool overwrite = true)

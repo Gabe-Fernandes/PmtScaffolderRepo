@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-
-namespace PmtScaffolder;
+﻿namespace PmtScaffolder;
 
 public static class Cmd
 {

@@ -45,6 +45,13 @@ public static class Validation
 
   public static bool Controllers()
   {
+    if (_userInput.Controllers.Count != _userInput.FileNames.Count)
+    {
+      Console.WriteLine("\nInvalid input - every controller needs at least one file name\n");
+      Console.WriteLine($"\nThere are {_userInput.Controllers.Count} controllers and {_userInput.FileNames.Count} file name lists\n");
+      return false;
+    }
+
     return true;
   }
 
