@@ -52,7 +52,7 @@ public static class FrontEnd
           case "scss": await PSCmd.RunPowerShellBatch(currentControllerPath, FrontEndTemplates.SassFile(file)); break;
           case "js": await PSCmd.RunPowerShellBatch(currentControllerPath, FrontEndTemplates.JsFile(file)); break;
           case "cshtml": await PSCmd.RunPowerShellBatch(currentControllerPath, FrontEndTemplates.CsHtmlFile(file, controller));
-                         await Util.InsertCode(currentControllerPath, FrontEndTemplates.CssLinkEle(file), $"_{controller}_Layout.cshtml", true);
+                         await Util.InsertWithCheck(FrontEndTemplates.CssLinkEle(file), currentControllerPath, $"_{controller}_Layout.cshtml", insertAtTop: false, htmlLandmark: true);
                          await Util.InsertCode(_userInput.ProjPath + "/Controllers", FrontEndTemplates.ControllerGetMethod(file), $"{controller}Controller.cs"); break;
         }
       }

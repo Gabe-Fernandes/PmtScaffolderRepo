@@ -13,12 +13,13 @@ public static class Util
 
 
 
-  public static async Task InsertWithCheck(string lineToInsert, string pathToCheck, string fileNameWithExtension, bool insertAtTop = false)
+  public static async Task InsertWithCheck(string lineToInsert, string pathToCheck, string fileNameWithExtension, bool insertAtTop = false, bool htmlLandmark = false)
   {
     string fileText = await ExtractFileText(pathToCheck, fileNameWithExtension);
+    string testLineToInsert = lineToInsert.Replace("PMT_TAB", "\t");
 
     // check if the line to insert already exists
-    if (fileText.Contains(lineToInsert) == false)
+    if (fileText.Contains(testLineToInsert) == false)
     {
       if (insertAtTop)
       {
@@ -26,7 +27,7 @@ public static class Util
         await PSCmd.RunPowerShellBatch(pathToCheck, CreateTemplateFormat(finalOutput, fileNameWithExtension));
         return;
       }
-      await InsertCode(pathToCheck, lineToInsert, fileNameWithExtension);
+      await InsertCode(pathToCheck, lineToInsert, fileNameWithExtension, htmlLandmark);
     }
   }
 
