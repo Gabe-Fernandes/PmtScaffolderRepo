@@ -4,6 +4,8 @@ public class UserInput
 {
   private static readonly UserInput _instance = new();
 
+  public string OverWrite = string.Empty;
+
   public string ProjPath { get; set; } = "C:\\dev\\ps_scaffolding\\autogen\\autogen";
   public string TestProjPath { get; set; } = "C:\\dev\\ps_scaffolding\\autogen\\autogenTests";
   public string ProjName { get; set; } = "AutoGen";

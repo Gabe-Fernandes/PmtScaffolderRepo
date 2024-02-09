@@ -9,14 +9,21 @@ public static class BackEnd
 
   public static async Task ScaffoldBackEndCode()
   {
-    await PSCmd.RunPowerShellBatch(_userInput.ProjPath + "/Data", BackEndTemplates.AppDbCtx());
+    // ensure Data folder exists
+    if (Util.TestPath(_userInput.ProjPath, _userInput.ProjPath + "/Data") == 0)
+    {
+      await PSCmd.RunPowerShell(_userInput.ProjPath, $"mkdir Data");
+    }
+
+    await PSCmd.RunPowerShellBatch(_userInput.ProjPath + "/Data", BackEndTemplates.AppDbCtx(), "AppDbContext.cs");
     Console.WriteLine(await GenerateCode(_userInput.ProjPath + "/Data/Models", "model class"));
     Console.WriteLine(await GenerateCode(_userInput.ProjPath + "/Data/RepoInterfaces", "repo interface"));
     Console.WriteLine(await GenerateCode(_userInput.ProjPath + "/Data/Repos", "repository"));
     Console.WriteLine(await GenerateCode(_userInput.TestProjPath + "/Data/Repos", "unit test"));
+    _userInput.OverWrite = string.Empty;
   }
 
-  private static async Task<string> GenerateCode(string filePath, string fileType, bool overwrite = true)
+  private static async Task<string> GenerateCode(string filePath, string fileType)
   {
     switch (Util.TestPath(_userInput.ProjPath, filePath))
     {
@@ -24,8 +31,6 @@ public static class BackEnd
       case 1: break;
       default: return $"Failed to test path: {filePath}";
     }
-
-    if (overwrite == false) { return string.Empty; }
 
     for (int i = 0; i < _userInput.Models.Count; i++)
     {
@@ -48,23 +53,23 @@ public static class BackEnd
       switch (fileType)
       {
         case "model class":
-          await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.ModelClassHeader(model).Concat(GetProperties(i)).ToArray());
+          await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.ModelClassHeader(model).Concat(GetProperties(i)).ToArray(), $"{model}.cs");
           if (model != "AppUser")
           {
             await Util.InsertCode(_userInput.ProjPath + "/Data", BackEndTemplates.DbSet(model, model.Pluralize()), "AppDbContext.cs");
           }
           break;
         case "repo interface":
-          await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.RepoInterface(model));
+          await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.RepoInterface(model), $"I{model}Repo.cs");
           break;
         case "repository": 
-          await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.Repository(model, model.Pluralize()));
+          await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.Repository(model, model.Pluralize()), $"{model}Repo.cs");
           await Util.InsertWithCheck($"using {_userInput.ProjName}.Data.RepoInterfaces;{br}", _userInput.ProjPath, "program.cs", true);
           await Util.InsertWithCheck($"using {_userInput.ProjName}.Data.Models;{br}", _userInput.ProjPath, "program.cs", true);
           await Util.InsertWithCheck(BackEndTemplates.DiRepoService(model), _userInput.ProjPath, "program.cs");
           break;
         case "unit test":
-          await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.UnitTest(model, model.Pluralize(), mockData.ToArray(), dbCtxMockData.ToArray()));
+          await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.UnitTest(model, model.Pluralize(), mockData.ToArray(), dbCtxMockData.ToArray()), $"{model}RepoTests.cs");
           break;
       }
     }
@@ -101,26 +106,4 @@ public static class BackEnd
 
     return props;
   }
-
-  //private static async Task CheckProgramCsForNamespaces(string model)
-  //{
-  //  string namespace0 = ;
-  //  string namespace1 = ;
-  //  string programCsText = await Util.ExtractFileText(_userInput.ProjPath, "program.cs");
-
-  //  if (programCsText.Contains() == false)
-  //  {
-  //    await Util.InsertCode(_userInput.ProjPath, BackEndTemplates.DiRepoService(model), "program.cs");
-  //  }
-  //  if (programCsText.Contains(namespace0) == false)
-  //  {
-  //    string finalOutput = Util.PartitionCodeFile(namespace0 + programCsText);
-  //    await PSCmd.RunPowerShellBatch(_userInput.ProjPath, Util.CreateTemplateFormat(finalOutput, "program.cs"));
-  //  }
-  //  if (programCsText.Contains(namespace1) == false)
-  //  {
-  //    string finalOutput = Util.PartitionCodeFile(namespace1 + programCsText);
-  //    await PSCmd.RunPowerShellBatch(_userInput.ProjPath, Util.CreateTemplateFormat(finalOutput, "program.cs"));
-  //  }
-  //}
 }

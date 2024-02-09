@@ -24,7 +24,7 @@ public static class Util
       if (insertAtTop)
       {
         string finalOutput = PartitionCodeFile(lineToInsert + fileText);
-        await PSCmd.RunPowerShellBatch(pathToCheck, CreateTemplateFormat(finalOutput, fileNameWithExtension));
+        await PSCmd.RunPowerShellBatch(pathToCheck, CreateTemplateFormat(finalOutput, fileNameWithExtension), fileNameWithExtension, isInsertion: true);
         return;
       }
       await InsertCode(pathToCheck, lineToInsert, fileNameWithExtension, htmlLandmark);
@@ -63,7 +63,7 @@ public static class Util
     string postLandmark = fileText.Substring(landmarkIndex + landmark.Length);
     string finalOutput = PartitionCodeFile(preLandmark + codeToInsert + postLandmark);
 
-    await PSCmd.RunPowerShellBatch(parentPath, CreateTemplateFormat(finalOutput, fileNameWithExtension));
+    await PSCmd.RunPowerShellBatch(parentPath, CreateTemplateFormat(finalOutput, fileNameWithExtension), fileNameWithExtension, isInsertion: true);
   }
 
 

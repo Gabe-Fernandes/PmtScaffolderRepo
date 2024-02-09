@@ -12,15 +12,14 @@ public static class FrontEnd
     Console.WriteLine(await GenerateCode(_userInput.ProjPath + "/Styles", "scss"));
     Console.WriteLine(await GenerateCode(_userInput.ProjPath + "/wwwroot/js", "js"));
     Console.WriteLine(await GenerateCode(_userInput.ProjPath + "/Views", "cshtml"));
-    // overwrite needs to check if files exist
-    // insertions need to check if lines exist (definitely css links)
+    _userInput.OverWrite = string.Empty;
     // have the app read a specific text file from the downloads folder, validate it, and scaffold
     // have PMT package and download a text file
     // register console app as a service
     // deploy
   }
 
-  private static async Task<string> GenerateCode(string filePath, string fileType, bool overwrite = true)
+  private static async Task<string> GenerateCode(string filePath, string fileType)
   {
     switch (Util.TestPath(_userInput.ProjPath, filePath))
     {
@@ -40,8 +39,6 @@ public static class FrontEnd
         case 1: break;
         default: return $"Failed to test path: {currentControllerPath}";
       }
-      
-      if (overwrite == false) { continue; }
 
       // Generate code files
       for (int j = 0; j < _userInput.FileNames[i].Count; j++)
@@ -49,9 +46,9 @@ public static class FrontEnd
         string file = _userInput.FileNames[i][j];
         switch (fileType)
         {
-          case "scss": await PSCmd.RunPowerShellBatch(currentControllerPath, FrontEndTemplates.SassFile(file)); break;
-          case "js": await PSCmd.RunPowerShellBatch(currentControllerPath, FrontEndTemplates.JsFile(file)); break;
-          case "cshtml": await PSCmd.RunPowerShellBatch(currentControllerPath, FrontEndTemplates.CsHtmlFile(file, controller));
+          case "scss": await PSCmd.RunPowerShellBatch(currentControllerPath, FrontEndTemplates.SassFile(file), file + ".scss"); break;
+          case "js": await PSCmd.RunPowerShellBatch(currentControllerPath, FrontEndTemplates.JsFile(file), file + ".js"); break;
+          case "cshtml": await PSCmd.RunPowerShellBatch(currentControllerPath, FrontEndTemplates.CsHtmlFile(file, controller), file + ".cshtml");
                          await Util.InsertWithCheck(FrontEndTemplates.CssLinkEle(file), currentControllerPath, $"_{controller}_Layout.cshtml", insertAtTop: false, htmlLandmark: true);
                          await Util.InsertCode(_userInput.ProjPath + "/Controllers", FrontEndTemplates.ControllerGetMethod(file), $"{controller}Controller.cs"); break;
         }
@@ -61,12 +58,18 @@ public static class FrontEnd
     return $"{fileType} scaffold complete";
   }
 
-  private static async Task<string> GenerateControllerClass(string filePath, bool overwrite = true)
+  private static async Task<string> GenerateControllerClass(string filePath)
   {
+    switch (Util.TestPath(_userInput.ProjPath, filePath))
+    {
+      case 0: await PSCmd.RunPowerShell(_userInput.ProjPath, $"mkdir {filePath}"); break;
+      case 1: break;
+      default: return $"Failed to test path: {filePath}";
+    }
+
     for (int i = 0; i < _userInput.Controllers.Count; i++)
     {
-      if (overwrite == false) { return string.Empty; }
-      await PSCmd.RunPowerShellBatch(filePath, FrontEndTemplates.ControllerFile(_userInput.Controllers[i]));
+      await PSCmd.RunPowerShellBatch(filePath, FrontEndTemplates.ControllerFile(_userInput.Controllers[i]), $"{_userInput.Controllers[i]}Controller.cs");
     }
 
     return "controller class(es) complete";
@@ -79,8 +82,8 @@ public static class FrontEnd
     if (fileType == "cshtml")
     {
       string currentControllerPath = $"{filePath}/{_userInput.Controllers[i]}";
-      await PSCmd.RunPowerShellBatch(currentControllerPath, FrontEndTemplates.ViewStartFile(_userInput.Controllers[i]));
-      await PSCmd.RunPowerShellBatch(currentControllerPath, FrontEndTemplates.LayoutFile(_userInput.Controllers[i]));
+      await PSCmd.RunPowerShellBatch(currentControllerPath, FrontEndTemplates.ViewStartFile(_userInput.Controllers[i]), "_ViewStart.cshtml");
+      await PSCmd.RunPowerShellBatch(currentControllerPath, FrontEndTemplates.LayoutFile(_userInput.Controllers[i]), $"_{_userInput.Controllers[i]}_Layout.cshtml");
     }
   }
 }
