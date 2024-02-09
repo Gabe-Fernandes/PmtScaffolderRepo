@@ -5,9 +5,6 @@ namespace PmtScaffolder;
 public static class Cmd
 {
   private static UserInput _userInput = UserInput.GetUserInput();
-  private static readonly Regex regex = new(@"^[a-zA-Z0-9_,@]+$");
-  private static readonly Regex pathRegex = new(@"^[a-zA-Z0-9_,\-/"" .\\:]+$");
-  private static readonly Regex projNameRegex = new(@"^[a-zA-Z0-9_,\-/""()!@#$%^&*. ]+$");
 
   public static async Task<bool> RunValidInput(string input)
   {
@@ -31,13 +28,23 @@ public static class Cmd
       case "pmt get properties": Print2DCollection(_userInput.Properties); return true;
       case "pmt get controllers": PrintCollection(_userInput.Controllers); return true;
       case "pmt args": PrintArgs(); return true;
-      case "pmt front": await FrontEnd.ScaffoldFrontEndCode(); return true;
-      case "pmt back": await BackEnd.ScaffoldBackEndCode(); return true;
+      case "pmt front": 
+        if (Validation.Controllers())
+        {
+          await FrontEnd.ScaffoldFrontEndCode();
+        }
+        return true;
+      case "pmt back":
+        if (Validation.Models())
+        {
+          await BackEnd.ScaffoldBackEndCode();
+        }
+        return true;
     }
 
     if (normalizedInput.IndexOf("pmt set ") == 0)
     {
-      return ValidSetCmd(normalizedInput, input);
+      return Validation.ValidSetCmd(normalizedInput, input);
     }
 
     return false;
@@ -45,67 +52,7 @@ public static class Cmd
 
 
 
-  private static bool ValidSetCmd(string normalizedInput, string input)
-  {
-    if (normalizedInput.IndexOf("proj-path ") == 8 &&
-      pathRegex.IsMatch(input[18..]))
-    {
-      _userInput.ProjPath = input[18..];
-      return true;
-    }
-    else if (normalizedInput.IndexOf("proj-name ") == 8 &&
-      projNameRegex.IsMatch(input[18..]))
-    {
-      _userInput.ProjName = input[18..];
-      return true;
-    }
-    else if (normalizedInput.IndexOf("test-proj-path ") == 8 &&
-      pathRegex.IsMatch(input[23..]))
-    {
-      _userInput.TestProjPath = input[23..];
-      return true;
-    }
-    else if (normalizedInput.IndexOf("test-proj-name ") == 8 &&
-      projNameRegex.IsMatch(input[23..]))
-    {
-      _userInput.TestProjName = input[23..];
-      return true;
-    }
-    else if (normalizedInput.IndexOf("controllers ") == 8 &&
-      regex.IsMatch(input[20..]))
-    {
-      _userInput.Controllers = ParseInput(input[20..]);
-      return true;
-    }
-    else if (normalizedInput.IndexOf("file-names ") == 8 &&
-      regex.IsMatch(input[19..]))
-    {
-      _userInput.FileNames = Parse2DInput(input[19..]);
-      return true;
-    }
-    else if (normalizedInput.IndexOf("models ") == 8 &&
-      regex.IsMatch(input[15..]))
-    {
-      _userInput.Models = ParseInput(input[15..]);
-      return true;
-    }
-    else if (normalizedInput.IndexOf("data-types ") == 8 &&
-      regex.IsMatch(input[19..]))
-    {
-      _userInput.DataTypes = Parse2DInput(input[19..]);
-      return true;
-    }
-    else if (normalizedInput.IndexOf("properties ") == 8 &&
-      regex.IsMatch(input[19..]))
-    {
-      _userInput.Properties = Parse2DInput(input[19..]);
-      return true;
-    }
-
-    return false;
-  }
-
-  private static List<string> ParseInput(string input)
+  public static List<string> ParseInput(string input)
   {
     List<string> collection = [];
     string tempString = string.Empty;
@@ -123,7 +70,7 @@ public static class Cmd
     return collection;
   }
 
-  private static List<List<string>> Parse2DInput(string input)
+  public static List<List<string>> Parse2DInput(string input)
   {
     List<List<string>> collection = [];
     List<string> tempList = [];
@@ -157,7 +104,7 @@ public static class Cmd
     return collection;
   }
 
-  private static void PrintCollection(List<string> collection)
+  public static void PrintCollection(List<string> collection)
   {
     foreach (string item in collection)
     {
@@ -179,12 +126,57 @@ public static class Cmd
 
   private static void PrintModels()
   {
-    for (int i = 0; i < _userInput.Models.Count; i++)
+    int iterations = Math.Max(_userInput.Models.Count, Math.Max(_userInput.DataTypes.Count, _userInput.Properties.Count));
+
+    for (int i = 0; i < iterations; i++)
     {
-      Console.WriteLine($"{_userInput.Models[i]}:");
-      for (int j = 0; j < _userInput.Properties.Count; j++)
+      string model = "_____";
+
+      if (_userInput.Models.Count > i)
       {
-        Console.WriteLine($"-- {_userInput.DataTypes[i][j]} {_userInput.Properties[i][j]}");
+        model = _userInput.Models[i];
+      }
+
+      Console.WriteLine($"{model}:");
+
+      int innerPropCount = 0;
+      int innerDataTypeCount = 0;
+
+      if (_userInput.Properties.Count > i)
+      {
+        innerPropCount = _userInput.Properties[i].Count;
+      }
+
+      if (_userInput.DataTypes.Count > i)
+      {
+        innerDataTypeCount = _userInput.DataTypes[i].Count;
+      }
+
+      int innerIterations = Math.Max(innerPropCount, innerDataTypeCount);
+
+      for (int j = 0; j < innerIterations; j++)
+      {
+        string dataType = "_____";
+        string property = "_____";
+
+        // these if statements are to ensure these collections contain elements at the given indeces
+        if (_userInput.DataTypes.Count > i)
+        {
+          if (_userInput.DataTypes[i].Count > j)
+          {
+            dataType = _userInput.DataTypes[i][j];
+          }
+        }
+
+        if (_userInput.Properties.Count > i)
+        {
+          if (_userInput.Properties[i].Count > j)
+          {
+            property = _userInput.Properties[i][j];
+          }
+        }
+
+        Console.WriteLine($"-- {dataType} {property}");
       }
     }
   }

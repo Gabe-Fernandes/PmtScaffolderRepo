@@ -1,5 +1,4 @@
 ﻿using Humanizer;
-using System.Reflection;
 
 namespace PmtScaffolder;
 
@@ -8,8 +7,6 @@ public static class BackEnd
   private static readonly UserInput _userInput = UserInput.GetUserInput();
   private static readonly string br = Environment.NewLine;
 
-
-
   public static async Task ScaffoldBackEndCode()
   {
     await PSCmd.RunPowerShellBatch(_userInput.ProjPath + "/Data", BackEndTemplates.AppDbCtx());
@@ -17,7 +14,6 @@ public static class BackEnd
     Console.WriteLine(await GenerateCode(_userInput.ProjPath + "/Data/RepoInterfaces", "repo interface"));
     Console.WriteLine(await GenerateCode(_userInput.ProjPath + "/Data/Repos", "repository"));
     Console.WriteLine(await GenerateCode(_userInput.TestProjPath + "/Data/Repos", "unit test"));
-    // add capitalization where appropriate
   }
 
   private static async Task<string> GenerateCode(string filePath, string fileType, bool overwrite = true)

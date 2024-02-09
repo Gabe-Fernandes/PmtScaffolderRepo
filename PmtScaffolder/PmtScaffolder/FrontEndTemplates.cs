@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace PmtScaffolder;
+﻿namespace PmtScaffolder;
 
 public static class FrontEndTemplates
 {

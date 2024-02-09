@@ -13,10 +13,8 @@ public static class FrontEnd
     Console.WriteLine(await GenerateCode(_userInput.ProjPath + "/wwwroot/js", "js"));
     Console.WriteLine(await GenerateCode(_userInput.ProjPath + "/Views", "cshtml"));
     // overwrite needs to check if files exist
-
-    // validate pmt front and pmt back
-    // -- every model needs at least one property
-    // -- every property needs exactly one data type (compare sizes of collections)
+    // insertions need to check if lines exist (definitely css links)
+    // validate pmt front
   }
 
   private static async Task<string> GenerateCode(string filePath, string fileType, bool overwrite = true)
