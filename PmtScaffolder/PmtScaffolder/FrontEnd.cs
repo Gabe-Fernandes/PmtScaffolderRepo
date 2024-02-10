@@ -13,7 +13,6 @@ public static class FrontEnd
     Console.WriteLine(await GenerateCode(_userInput.ProjPath + "/wwwroot/js", "js"));
     Console.WriteLine(await GenerateCode(_userInput.ProjPath + "/Views", "cshtml"));
     _userInput.OverWrite = string.Empty;
-    // have the app read a specific text file from the downloads folder, validate it, and scaffold
     // have PMT package and download a text file
     // register console app as a service
     // deploy

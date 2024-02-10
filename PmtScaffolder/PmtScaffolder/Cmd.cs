@@ -1,4 +1,6 @@
-﻿namespace PmtScaffolder;
+﻿using Syroot.Windows.IO;
+
+namespace PmtScaffolder;
 
 public static class Cmd
 {
@@ -16,6 +18,7 @@ public static class Cmd
       case "pmt cls": Console.Clear(); return true;
       case "pmt": PrintPmtHelp(); return true;
       case "pmt help": PrintPmtHelp(); return true;
+      case "pmt import": ReadImportedFile(); return true;
       case "pmt get proj-path": Console.WriteLine(_userInput.ProjPath); return true;
       case "pmt get proj-name": Console.WriteLine(_userInput.ProjName); return true;
       case "pmt get test-proj-path": Console.WriteLine(_userInput.TestProjPath); return true;
@@ -46,6 +49,29 @@ public static class Cmd
     }
 
     return false;
+  }
+
+
+
+  private static void ReadImportedFile()
+  {
+    string downloadsPath = KnownFolders.Downloads.Path;
+    string path = Path.Combine(downloadsPath, "___PMT___DATA___FROM___WEBAPP___.txt");
+
+    if (File.Exists(path))
+    {
+      using (StreamReader sr = File.OpenText(path))
+      {
+        string fileText = sr.ReadToEnd();
+        Console.WriteLine("\nImporting...\n");
+        Console.WriteLine(fileText);
+        ImportedDataHandler handler = new();
+        handler.ParseImportedFile(fileText);
+      }
+      return;
+    }
+
+    Console.WriteLine("\nFailed to find PMT data\n");
   }
 
 
@@ -241,6 +267,8 @@ public static class Cmd
     Console.WriteLine("pmt set models");
     Console.WriteLine("pmt set data-types");
     Console.WriteLine("pmt set properties");
+
+    Console.WriteLine("\npmt import\n");
 
     Console.WriteLine("\npmt args");
     Console.WriteLine("pmt front");
