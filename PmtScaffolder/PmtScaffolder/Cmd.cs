@@ -66,7 +66,7 @@ public static class Cmd
         Console.WriteLine("\nImporting...\n");
         Console.WriteLine(fileText);
         ImportedDataHandler handler = new();
-        handler.ParseImportedFile(fileText);
+        ImportedDataHandler.ParseImportedFile(fileText);
       }
       return;
     }

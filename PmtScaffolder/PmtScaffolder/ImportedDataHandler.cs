@@ -6,7 +6,7 @@ public class ImportedDataHandler
   public const string newModelDelimiter = "M____&_____";
   private static readonly UserInput _userInput = UserInput.GetUserInput();
 
-  public void ParseImportedFile(string data)
+  public static void ParseImportedFile(string data)
   {
     int endOfModeldataIndex = data.IndexOf("###PMT###");
     string rawModelData = data.Substring(0, endOfModeldataIndex);

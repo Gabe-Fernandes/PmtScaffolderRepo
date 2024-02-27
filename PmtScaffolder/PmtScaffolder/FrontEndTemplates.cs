@@ -118,4 +118,9 @@ public static class FrontEndTemplates
   {
     return $"{br}{tab}public async Task<IActionResult> {Util.Capital(viewName, true)}(){br}{tab}{{{br}{tab}{tab}return View();{br}{tab}}}{br}";
   }
+
+  public static string SassProjFileCmd(string controllerName, string fileName)
+  {
+    return $"{br}{tab}{tab}<Exec Command=\"sass $(ProjectDir)Styles\\{Util.Capital(controllerName, true)}\\{Util.Capital(fileName, false)}.scss $(ProjectDir)wwwroot\\css\\{Util.Capital(fileName, false)}.css\" />";
+  }
 }

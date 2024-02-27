@@ -13,9 +13,6 @@ public static class FrontEnd
     Console.WriteLine(await GenerateCode(_userInput.ProjPath + "/wwwroot/js", "js"));
     Console.WriteLine(await GenerateCode(_userInput.ProjPath + "/Views", "cshtml"));
     _userInput.OverWrite = string.Empty;
-    // have PMT package and download a text file
-    // register console app as a service
-    // deploy
   }
 
   private static async Task<string> GenerateCode(string filePath, string fileType)
@@ -45,7 +42,8 @@ public static class FrontEnd
         string file = _userInput.FileNames[i][j];
         switch (fileType)
         {
-          case "scss": await PSCmd.RunPowerShellBatch(currentControllerPath, FrontEndTemplates.SassFile(file), file + ".scss"); break;
+          case "scss": await PSCmd.RunPowerShellBatch(currentControllerPath, FrontEndTemplates.SassFile(file), file + ".scss");
+                       await Util.InsertWithCheck(FrontEndTemplates.SassProjFileCmd(controller, file), _userInput.ProjPath, $"{_userInput.ProjName}.csproj", insertAtTop: false, htmlLandmark: true); break;
           case "js": await PSCmd.RunPowerShellBatch(currentControllerPath, FrontEndTemplates.JsFile(file), file + ".js"); break;
           case "cshtml": await PSCmd.RunPowerShellBatch(currentControllerPath, FrontEndTemplates.CsHtmlFile(file, controller), file + ".cshtml");
                          await Util.InsertWithCheck(FrontEndTemplates.CssLinkEle(file), currentControllerPath, $"_{controller}_Layout.cshtml", insertAtTop: false, htmlLandmark: true);
