@@ -6,13 +6,13 @@ public class UserInput
 
   public string OverWrite = string.Empty;
 
-  public string ProjPath { get; set; } = "C:\\dev\\pmtscaffolderrepo\\autogen\\autogen";
+  public string ProjPath { get; set; }
   public string TestProjPath { get; set; }
-  public string ProjName { get; set; } = "AutoGen";
+  public string ProjName { get; set; }
   public string TestProjName { get; set; }
 
-  public List<string> Controllers = ["Test", "example"];
-  public List<List<string>> FileNames = [["One", "Two", "Three"], ["four", "five", "six"]];
+  public List<string> Controllers = [];
+  public List<List<string>> FileNames = [];
 
   public List<string> Models = [];
   public List<List<string>> DataTypes = [];

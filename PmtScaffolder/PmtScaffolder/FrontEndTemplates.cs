@@ -16,7 +16,7 @@ public static class FrontEndTemplates
               $"{br}\t",
             $"{br}}}",
 
-            $"'> {fileName}.scss"];
+            $"'| out-file {fileName}.scss -encoding utf8"];
   }
 
   public static string[] JsFile(string fileName)
