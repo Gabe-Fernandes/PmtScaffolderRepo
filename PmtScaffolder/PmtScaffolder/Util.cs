@@ -63,6 +63,16 @@ public static class Util
     string postLandmark = fileText.Substring(landmarkIndex + landmark.Length);
     string finalOutput = PartitionCodeFile(preLandmark + codeToInsert + postLandmark);
 
+    // account for apostrophes
+    for (int i = 0; i < finalOutput.Length; i++)
+    {
+      if (finalOutput[i] == '\'')
+      {
+        finalOutput = finalOutput.Substring(0, i) + '\'' + finalOutput.Substring(i);
+        i++; // skip past the new apostrophe
+      }
+    }
+
     await PSCmd.RunPowerShellBatch(parentPath, CreateTemplateFormat(finalOutput, fileNameWithExtension), fileNameWithExtension, isInsertion: true);
   }
 

@@ -84,6 +84,7 @@ public static class BackEnd
       "string" => "\"test string\"",
       "int" => "2",
       "float" => "2.5",
+      "double" => "2.5",
       "DateTime" => "DateTime.Now",
       _ => "ERROR",
     };

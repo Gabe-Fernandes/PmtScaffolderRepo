@@ -6,10 +6,10 @@ public class UserInput
 
   public string OverWrite = string.Empty;
 
-  public string ProjPath { get; set; }
-  public string TestProjPath { get; set; }
-  public string ProjName { get; set; }
-  public string TestProjName { get; set; }
+  public string ProjPath { get; set; } = "C:\\dev\\PmtScaffolderRepo\\AutoGen\\AutoGen";
+  public string TestProjPath { get; set; } = "C:\\dev\\PmtScaffolderRepo\\AutoGen\\AutoGenTests";
+  public string ProjName { get; set; } = "AutoGen";
+  public string TestProjName { get; set; } = "AutoGenTests";
 
   public List<string> Controllers = [];
   public List<List<string>> FileNames = [];
