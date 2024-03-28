@@ -12,6 +12,8 @@ public static class FrontEnd
     Console.WriteLine(await GenerateCode(_userInput.ProjPath + "/Styles", "scss"));
     Console.WriteLine(await GenerateCode(_userInput.ProjPath + "/wwwroot/js", "js"));
     Console.WriteLine(await GenerateCode(_userInput.ProjPath + "/Views", "cshtml"));
+    Validation.PrintErrorReport();
+    _userInput.ErrorReport = [];
     _userInput.OverWrite = string.Empty;
   }
 

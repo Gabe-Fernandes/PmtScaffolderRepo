@@ -16,8 +16,7 @@ public static class PSCmd
     }
     catch (Exception ex)
     {
-      Console.WriteLine("\n\n=============== Project path may be incorrect ===============\n\n");
-      Console.WriteLine(ex.ToString() + '\n');
+      HandleException(ex, path, cmd);
       return null;
     }
   }
@@ -69,9 +68,19 @@ public static class PSCmd
     }
     catch (Exception ex)
     {
-      Console.WriteLine("\n\n=============== Project path may be incorrect ===============\n\n");
-      Console.WriteLine(ex.ToString() + '\n');
+      HandleException(ex, path, cmd[0]);
       return null;
     }
+  }
+
+  private static void HandleException(Exception ex, string path, string cmd)
+  {
+    _userInput.ErrorReport.Add("Project path may be incorrect");
+    _userInput.ErrorReport.Add("Path:");
+    _userInput.ErrorReport.Add(path);
+    _userInput.ErrorReport.Add("Command:");
+    _userInput.ErrorReport.Add(cmd);
+    _userInput.ErrorReport.Add("Exception:");
+    _userInput.ErrorReport.Add(ex.ToString() + "\n\n");
   }
 }

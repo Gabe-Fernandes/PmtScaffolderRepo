@@ -3,6 +3,7 @@
 public static class Util
 {
   private static readonly string br = Environment.NewLine;
+  private static UserInput _userInput = UserInput.GetUserInput();
 
   public static int TestPath(string currentPathToTestFrom, string pathToTest)
   {
@@ -55,6 +56,7 @@ public static class Util
     if (landmarkIndex == -1) // error handling
     {
       Console.WriteLine($"\n===========================Please ensure the code file at {Path.Combine(parentPath, fileNameWithExtension)} has the comment, \"{landmark}\" above where lines of code are to be inserted.===========================\n");
+      _userInput.ErrorReport.Add($"\n\nPlease ensure the code file at {Path.Combine(parentPath, fileNameWithExtension)} has the comment, \"{landmark}\" above where lines of code are to be inserted.\n\n");
       return;
     }
 

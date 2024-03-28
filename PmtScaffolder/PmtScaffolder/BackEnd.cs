@@ -20,6 +20,8 @@ public static class BackEnd
     Console.WriteLine(await GenerateCode(_userInput.ProjPath + "/Data/RepoInterfaces", "repo interface"));
     Console.WriteLine(await GenerateCode(_userInput.ProjPath + "/Data/Repos", "repository"));
     Console.WriteLine(await GenerateCode(_userInput.TestProjPath + "/Data/Repos", "unit test"));
+    Validation.PrintErrorReport();
+    _userInput.ErrorReport = [];
     _userInput.OverWrite = string.Empty;
   }
 

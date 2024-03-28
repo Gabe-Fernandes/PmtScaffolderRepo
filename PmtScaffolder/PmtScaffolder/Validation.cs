@@ -114,4 +114,17 @@ public static class Validation
 
     return false;
   }
+
+  public static void PrintErrorReport()
+  {
+    if (_userInput.ErrorReport.Count != 0)
+    {
+      Console.WriteLine("\n\n\n_______________________________________ ERROR REPORT _______________________________________\n\n\n");
+    }
+
+    for (int i = 0; i < _userInput.ErrorReport.Count; i++)
+    {
+      Console.WriteLine(_userInput.ErrorReport[i]);
+    }
+  }
 }

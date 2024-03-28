@@ -5,6 +5,7 @@ public class UserInput
   private static readonly UserInput _instance = new();
 
   public string OverWrite = string.Empty;
+  public List<string> ErrorReport = [];
 
   public string ProjPath { get; set; } = "C:\\dev\\PmtScaffolderRepo\\AutoGen\\AutoGen";
   public string TestProjPath { get; set; } = "C:\\dev\\PmtScaffolderRepo\\AutoGen\\AutoGenTests";
