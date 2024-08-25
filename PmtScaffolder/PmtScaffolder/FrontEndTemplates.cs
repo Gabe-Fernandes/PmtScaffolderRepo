@@ -116,7 +116,7 @@ public static class FrontEndTemplates
 
   public static string ControllerGetMethod(string viewName)
   {
-    return $"{br}{tab}public async Task<IActionResult> {Util.Capital(viewName, true)}(){br}{tab}{{{br}{tab}{tab}return View();{br}{tab}}}{br}";
+    return $"{br}{tab}public IActionResult {Util.Capital(viewName, true)}(){br}{tab}{{{br}{tab}{tab}return View();{br}{tab}}}{br}";
   }
 
   public static string SassProjFileCmd(string controllerName, string fileName)
