@@ -18,7 +18,9 @@ public static class Cmd
       case "pmt cls": Console.Clear(); return true;
       case "pmt": PrintPmtHelp(); return true;
       case "pmt help": PrintPmtHelp(); return true;
-      case "pmt import": ReadImportedFile(); return true;
+      case "pmt import front": ReadImportedFile("front"); return true;
+      case "pmt import front signalr": ReadImportedFile("front signalr"); return true;
+      case "pmt import back": ReadImportedFile("back"); return true;
       case "pmt get proj-path": Console.WriteLine(_userInput.ProjPath); return true;
       case "pmt get proj-name": Console.WriteLine(_userInput.ProjName); return true;
       case "pmt get test-proj-path": Console.WriteLine(_userInput.TestProjPath); return true;
@@ -33,6 +35,13 @@ public static class Cmd
         if (Validation.Controllers())
         {
           await FrontEnd.ScaffoldFrontEndCode();
+        }
+        return true;
+      case "pmt front signalr":
+        if (Validation.Controllers())
+        {
+          await FrontEnd.ScaffoldFrontEndCode();
+          // scaffold signalr
         }
         return true;
       case "pmt back":
@@ -53,10 +62,17 @@ public static class Cmd
 
 
 
-  private static void ReadImportedFile()
+  private static async Task ReadImportedFile(string importType)
   {
     string downloadsPath = KnownFolders.Downloads.Path;
-    string path = Path.Combine(downloadsPath, "___PMT___DATA___FROM___WEBAPP___.txt");
+    string fileName = importType switch
+    {
+      "front" => "___PMT___FRONTEND___DATA___FROM___WEBAPP___.txt",
+      "front signalr" => "___PMT___SIGNALR___DATA___FROM___WEBAPP___.txt",
+      "back" => "___PMT___BACKEND___DATA___FROM___WEBAPP___.txt",
+      _ => string.Empty
+    };
+    string path = Path.Combine(downloadsPath, fileName);
 
     if (File.Exists(path))
     {
@@ -66,8 +82,10 @@ public static class Cmd
         Console.WriteLine("\nImporting...\n");
         Console.WriteLine(fileText);
         ImportedDataHandler handler = new();
-        ImportedDataHandler.ParseImportedFile(fileText);
+        ImportedDataHandler.ParseImportedFile(fileText, importType);
       }
+      // clean up imported file
+      await PSCmd.RunPowerShell(downloadsPath, $"del {fileName}");
       return;
     }
 
@@ -268,10 +286,13 @@ public static class Cmd
     Console.WriteLine("pmt set data-types");
     Console.WriteLine("pmt set properties");
 
-    Console.WriteLine("\npmt import\n");
+    Console.WriteLine("\npmt import front");
+    Console.WriteLine("pmt import front signalr");
+    Console.WriteLine("pmt import back\n");
 
-    Console.WriteLine("\npmt args");
+    Console.WriteLine("pmt args");
     Console.WriteLine("pmt front");
+    Console.WriteLine("pmt front signalr");
     Console.WriteLine("pmt back");
     Console.WriteLine("\n=============================================\n");
   }

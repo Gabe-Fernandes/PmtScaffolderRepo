@@ -6,14 +6,22 @@ public class ImportedDataHandler
   public const string newModelDelimiter = "M____&_____";
   private static readonly UserInput _userInput = UserInput.GetUserInput();
 
-  public static void ParseImportedFile(string data)
+  public static void ParseImportedFile(string data, string importType)
   {
-    int endOfModeldataIndex = data.IndexOf("###PMT###");
-    string rawModelData = data.Substring(0, endOfModeldataIndex);
-    string rawPropData = data.Substring(endOfModeldataIndex + 9);
+    int endOf1dDataIndex = data.IndexOf("###PMT###");
+    string raw1dData = data.Substring(0, endOf1dDataIndex);
+    string raw2dData = data.Substring(endOf1dDataIndex + 9);
 
-    _userInput.Models = ExtractData(rawModelData);
-    ParsePropData(rawPropData);
+    if (importType == "front")
+    {
+      _userInput.Controllers = ExtractData(raw1dData);
+      _userInput.FileNames = Extract2dData(raw2dData);
+    }
+    if (importType == "back")
+    {
+      _userInput.Models = ExtractData(raw1dData);
+      ParsePropData(raw2dData);
+    }
   }
 
   private static void ParsePropData(string rawPropData)
