@@ -18,9 +18,9 @@ public static class Cmd
       case "pmt cls": Console.Clear(); return true;
       case "pmt": PrintPmtHelp(); return true;
       case "pmt help": PrintPmtHelp(); return true;
-      case "pmt import front": ReadImportedFile("front"); return true;
-      case "pmt import front signalr": ReadImportedFile("front signalr"); return true;
-      case "pmt import back": ReadImportedFile("back"); return true;
+      case "pmt import front": await ReadImportedFile("front"); return true;
+      case "pmt import front signalr": await ReadImportedFile("front signalr"); return true;
+      case "pmt import back": await ReadImportedFile("back"); return true;
       case "pmt get proj-path": Console.WriteLine(_userInput.ProjPath); return true;
       case "pmt get proj-name": Console.WriteLine(_userInput.ProjName); return true;
       case "pmt get test-proj-path": Console.WriteLine(_userInput.TestProjPath); return true;
@@ -41,7 +41,7 @@ public static class Cmd
         if (Validation.Controllers())
         {
           await FrontEnd.ScaffoldFrontEndCode();
-          // scaffold signalr
+          await SignalR.ScaffoldSignalRCode();
         }
         return true;
       case "pmt back":
@@ -70,7 +70,7 @@ public static class Cmd
       "front" => "___PMT___FRONTEND___DATA___FROM___WEBAPP___.txt",
       "front signalr" => "___PMT___SIGNALR___DATA___FROM___WEBAPP___.txt",
       "back" => "___PMT___BACKEND___DATA___FROM___WEBAPP___.txt",
-      _ => string.Empty
+      _ => "ERROR"
     };
     string path = Path.Combine(downloadsPath, fileName);
 
