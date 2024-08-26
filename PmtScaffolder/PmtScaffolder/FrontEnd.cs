@@ -46,10 +46,10 @@ public static class FrontEnd
         switch (fileType)
         {
           case "scss": await PSCmd.RunPowerShellBatch(currentControllerPath, FrontEndTemplates.SassFile(file), file + ".scss");
-                       await Util.InsertWithCheck(FrontEndTemplates.SassProjFileCmd(controller, file), _userInput.ProjPath, $"{_userInput.ProjName}.csproj", insertAtTop: false, htmlLandmark: true); break;
+                       await Util.InsertWithCheck(FrontEndTemplates.SassProjFileCmd(controller, file), _userInput.ProjPath, $"{_userInput.ProjName}.csproj", insertAtTop: false, "<!--PMT Landmark-->"); break;
           case "js": await PSCmd.RunPowerShellBatch(currentControllerPath, FrontEndTemplates.JsFile(file), file + ".js"); break;
           case "cshtml": await PSCmd.RunPowerShellBatch(currentControllerPath, FrontEndTemplates.CsHtmlFile(file, controller), file + ".cshtml");
-                         await Util.InsertWithCheck(FrontEndTemplates.CssLinkEle(file), currentControllerPath, $"_{controller}_Layout.cshtml", insertAtTop: false, htmlLandmark: true);
+                         await Util.InsertWithCheck(FrontEndTemplates.CssLinkEle(file), currentControllerPath, $"_{controller}_Layout.cshtml", insertAtTop: false, "<!--PMT Landmark-->");
                          await Util.InsertCode(_userInput.ProjPath + "/Controllers", FrontEndTemplates.ControllerGetMethod(file), $"{controller}Controller.cs"); break;
         }
       }

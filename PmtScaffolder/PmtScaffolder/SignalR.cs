@@ -1,6 +1,4 @@
-﻿using Microsoft.VisualBasic.FileIO;
-
-namespace PmtScaffolder;
+﻿namespace PmtScaffolder;
 
 public static class SignalR
 {
@@ -16,7 +14,7 @@ public static class SignalR
     }
 
     // add signalR service to DI container
-    // map hubs in middleware pipeline
+    await Util.InsertWithCheck(SignalRTemplates.AddSignalRService(), _userInput.ProjPath, "program.cs", false, "// SignalR Landmark");
 
     await GenerateCode();
 
@@ -47,6 +45,11 @@ public static class SignalR
         {
           await PSCmd.RunPowerShell(ControllerHubPath, $"mkdir {fileName}Files");
         }
+
+        // map hubs in the middleware pipeline
+        await Util.InsertWithCheck(SignalRTemplates.MapHubMiddleWare(fileName), _userInput.ProjPath, "program.cs", false, "// Map Hubs Landmark");
+        // insert using directives for each hub mapping
+        await Util.InsertWithCheck($"using {_userInput.ProjName}.SignalRHubs.{controllerName}Hubs.{fileName}Files;{br}", _userInput.ProjPath, "program.cs", true);
 
         string hubFilesPath = Path.Combine(ControllerHubPath, $"{fileName}Files");
         await PSCmd.RunPowerShellBatch(hubFilesPath, SignalRTemplates.HubDTO(controllerName, fileName), $"{fileName}DTOs.cs");

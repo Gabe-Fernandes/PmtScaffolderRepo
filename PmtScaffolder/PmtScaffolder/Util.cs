@@ -14,7 +14,7 @@ public static class Util
 
 
 
-  public static async Task InsertWithCheck(string lineToInsert, string pathToCheck, string fileNameWithExtension, bool insertAtTop = false, bool htmlLandmark = false)
+  public static async Task InsertWithCheck(string lineToInsert, string pathToCheck, string fileNameWithExtension, bool insertAtTop = false, string landmark = "// PMT Landmark")
   {
     string fileText = await ExtractFileText(pathToCheck, fileNameWithExtension);
     string testLineToInsert = lineToInsert.Replace("PMT_TAB", "\t");
@@ -28,7 +28,7 @@ public static class Util
         await PSCmd.RunPowerShellBatch(pathToCheck, CreateTemplateFormat(finalOutput, fileNameWithExtension), fileNameWithExtension, isInsertion: true);
         return;
       }
-      await InsertCode(pathToCheck, lineToInsert, fileNameWithExtension, htmlLandmark);
+      await InsertCode(pathToCheck, lineToInsert, fileNameWithExtension, landmark);
     }
   }
 
@@ -45,13 +45,12 @@ public static class Util
 
 
 
-  public static async Task InsertCode(string parentPath, string codeToInsert, string fileNameWithExtension, bool htmlLandmark = false)
+  public static async Task InsertCode(string parentPath, string codeToInsert, string fileNameWithExtension, string landmark = "// PMT Landmark")
   {
     string fileText = await ExtractFileText(parentPath, fileNameWithExtension);
     if (string.IsNullOrEmpty(fileText)) { return; }
 
     // locate PMT Landmark
-    string landmark = htmlLandmark ? "<!--PMT Landmark-->" : "// PMT Landmark";
     int landmarkIndex = fileText.IndexOf(landmark);
     if (landmarkIndex == -1) // error handling
     {

@@ -19,7 +19,6 @@ public static class Cmd
       case "pmt": PrintPmtHelp(); return true;
       case "pmt help": PrintPmtHelp(); return true;
       case "pmt import front": await ReadImportedFile("front"); return true;
-      case "pmt import front signalr": await ReadImportedFile("front signalr"); return true;
       case "pmt import back": await ReadImportedFile("back"); return true;
       case "pmt get proj-path": Console.WriteLine(_userInput.ProjPath); return true;
       case "pmt get proj-name": Console.WriteLine(_userInput.ProjName); return true;
@@ -68,7 +67,6 @@ public static class Cmd
     string fileName = importType switch
     {
       "front" => "___PMT___FRONTEND___DATA___FROM___WEBAPP___.txt",
-      "front signalr" => "___PMT___SIGNALR___DATA___FROM___WEBAPP___.txt",
       "back" => "___PMT___BACKEND___DATA___FROM___WEBAPP___.txt",
       _ => "ERROR"
     };
@@ -287,10 +285,9 @@ public static class Cmd
     Console.WriteLine("pmt set properties");
 
     Console.WriteLine("\npmt import front");
-    Console.WriteLine("pmt import front signalr");
     Console.WriteLine("pmt import back\n");
 
-    Console.WriteLine("pmt args");
+    Console.WriteLine("pmt args\n");
     Console.WriteLine("pmt front");
     Console.WriteLine("pmt front signalr");
     Console.WriteLine("pmt back");

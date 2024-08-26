@@ -102,4 +102,14 @@ public static class SignalRTemplates
 
                 $"'> I{fileName}Hub.cs"];
   }
+
+  public static string AddSignalRService()
+  {
+    return $"{br}builder.Services.AddSignalR();";
+  }
+
+  public static string MapHubMiddleWare(string fileName)
+  {
+    return $"{br}app.MapHub<{fileName}Hub>(\"{Util.Capital(fileName, false)}\");";
+  }
 }
