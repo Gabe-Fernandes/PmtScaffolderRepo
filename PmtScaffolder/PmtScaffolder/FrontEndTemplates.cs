@@ -10,7 +10,7 @@ public static class FrontEndTemplates
   {
     fileName = Util.Capital(fileName, false);
 
-    return [$@"Write-Output '@import ""../_library.scss"";", br,
+    return [$@"Write-Output '@import ""../site.scss"";", br,
 
             $"{br}#{fileName}Content {{",
               $"{br}\t",
@@ -91,10 +91,12 @@ public static class FrontEndTemplates
               $@"{br}  <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"" />",
               $@"{br}  <title>@ViewData[""Title""] - {_userInput.ProjName}</title>",
               $@"{br}  <link rel=""icon"" href="""">",
-              $@"{br}  <link rel=""stylesheet"" href=""~/css/site.css"" asp-append-version=""true"" />",
               $@"{br}  <!--PMT Landmark-->",
-              $@"{br}  <script type=""text/javascript"" src=""~/lib/jquery/dist/jquery.js""></script>",
-              $@"{br}  <script defer type=""text/javascript"" src=""~/js/site.js""></script>",
+              $@"{br}",
+							$@"{br}  <script type=""text/javascript"" src=""~/lib/jquery/dist/jquery.js""></script>",
+							$@"{br}  <script type=""text/javascript"" src=""~/js/signalr.min.js""></script>",
+							$@"{br}  <script defer type=""text/javascript"" src=""https://cdn.jsdelivr.net/gh/Gabe-Fernandes/StyleDashRepo/js/styleDash.js""></script>",
+							$@"{br}  <script defer type=""text/javascript"" src=""~/js/site.js""></script>",
               $@"{br}</head>",
               $@"{br}<body>",
               $@"{br}  <div class=""no-js-warning"">This application relies heavily on javascript - please ensure it is enabled in your browser and refresh the page.</div>",
