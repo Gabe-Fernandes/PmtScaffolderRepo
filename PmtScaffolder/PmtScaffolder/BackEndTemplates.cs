@@ -66,7 +66,7 @@ public static class BackEndTemplates
     return [$"Write-Output 'using Microsoft.EntityFrameworkCore;",
             $"{br}using {_userInput.ProjName}.Data.RepoInterfaces;", br,
 
-            $"{br}namespace {_userInput.ProjName}.Data.Models;", br,
+            $"{br}namespace {_userInput.ProjName}.Data.Repos;", br,
 
             $"{br}public class {fileName}Repo(AppDbContext db) : I{fileName}Repo",
             $"{br}{{",
