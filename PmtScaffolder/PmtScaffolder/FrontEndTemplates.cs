@@ -96,7 +96,7 @@ public static class FrontEndTemplates
 							$@"{br}  <script type=""text/javascript"" src=""~/lib/jquery/dist/jquery.js""></script>",
 							$@"{br}  <script type=""text/javascript"" src=""~/js/signalr.min.js""></script>",
 							$@"{br}  <script defer type=""text/javascript"" src=""https://cdn.jsdelivr.net/gh/Gabe-Fernandes/StyleDashRepo/js/styleDash.js""></script>",
-							$@"{br}  <script defer type=""text/javascript"" src=""~/js/site.js""></script>",
+							$@"{br}  <script type=""text/javascript"" src=""~/js/site.js""></script>",
               $@"{br}</head>",
               $@"{br}<body>",
               $@"{br}  <div class=""no-js-warning"">This application relies heavily on javascript - please ensure it is enabled in your browser and refresh the page.</div>",
