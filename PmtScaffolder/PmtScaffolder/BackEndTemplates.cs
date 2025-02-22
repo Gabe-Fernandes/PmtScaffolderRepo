@@ -64,6 +64,7 @@ public static class BackEndTemplates
     }
 
     return [$"Write-Output 'using Microsoft.EntityFrameworkCore;",
+            $"{br}using {_userInput.ProjName}.Data.Models;",
             $"{br}using {_userInput.ProjName}.Data.RepoInterfaces;", br,
 
             $"{br}namespace {_userInput.ProjName}.Data.Repos;", br,
@@ -152,30 +153,20 @@ public static class BackEndTemplates
 
     string[] unitTestPart0 = [$"Write-Output 'using Microsoft.EntityFrameworkCore;",
             $"{br}using {_userInput.ProjName}.Data.Models;",
+            $"{br}using {_userInput.ProjName}.Data.Repos;",
             $"{br}using {_userInput.ProjName}.Data;", br,
 
             $"{br}namespace {_userInput.TestProjName}.Data.Repos;", br,
 
             $"{br}public class {fileName}RepoTests",
             $"{br}{{",
-              $"{br}\tprivate readonly AppDbContext _dbContext;",
-              $"{br}\tprivate readonly {fileName}Repo _{lowerCaseFileName}Repo;", br,
-
-              $"{br}\tpublic {fileName}RepoTests()",
-              $"{br}\t{{",
-                $"{br}\t\t// Dependencies",
-                $"{br}\t\t_dbContext = GetDbContext();",
-                $"{br}\t\t// SUT",
-                $"{br}\t\t_{lowerCaseFileName}Repo = new {fileName}Repo(_dbContext);",
-              $"{br}\t}}", br,
-
-              $"{br}\tprivate AppDbContext GetDbContext()",
+              $"{br}\tprivate static async Task<AppDbContext> GetDbContext()",
               $"{br}\t{{",
                 $"{br}\t\tvar options = new DbContextOptionsBuilder<AppDbContext>()",
                 $"{br}\t\t\t.UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()).Options;",
                 $"{br}\t\tvar dbContext = new AppDbContext(options);",
                 $"{br}\t\tdbContext.Database.EnsureCreated();",
-                $"{br}\t\tif (dbContext.{pluralName}.Count() < 0)",
+                $"{br}\t\tif (!await dbContext.{pluralName}.AnyAsync())",
                 $"{br}\t\t{{",
                   $"{br}\t\t\tfor (int i = 0; i < 10; i++)",
                   $"{br}\t\t\t{{",
@@ -184,73 +175,77 @@ public static class BackEndTemplates
                       $"{br}\t\t\t\t\t{idInstantiation}"];
     string[] unitTestPart1 = [
                     $"{br}\t\t\t\t}});",
-                    $"{br}\t\t\t\tdbContext.SaveChangesAsync();",
+                    $"{br}\t\t\t\tawait dbContext.SaveChangesAsync();",
                   $"{br}\t\t\t}}",
                 $"{br}\t\t}}",
                 $"{br}\t\treturn dbContext;",
               $"{br}\t}}", br,
 
               $"{br}\t[Fact]",
-              $"{br}\tpublic void Add_ReturnsTrue()",
+              $"{br}\tpublic async Task {fileName}Repo_Add_ReturnsTrue()",
               $"{br}\t{{",
                 $"{br}\t\t// Arrange",
-                $"{br}\t\tvar {lowerCaseFileName} = new {fileName}()",
+                $"{br}\t\tvar dbCtxStub = await GetDbContext();",
+                $"{br}\t\t{fileName}Repo sut = new(dbCtxStub);",
+                $"{br}\t\t{fileName} {lowerCaseFileName} = new()",
                 $"{br}\t\t{{"];
     string[] unitTestPart2 = [
                 $"{br}\t\t}};",
                 $"{br}\t\t// Act",
-                $"{br}\t\tvar result = _{lowerCaseFileName}Repo.Add({lowerCaseFileName});",
+                $"{br}\t\tvar result = sut.Add({lowerCaseFileName});",
                 $"{br}\t\t// Assert",
                 $"{br}\t\tAssert.True(result);",
               $"{br}\t}}", br,
 
               $"{br}\t[Fact]",
-              $"{br}\tpublic void Delete_ReturnsTrue()",
+              $"{br}\tpublic async Task {fileName}Repo_Delete_ReturnsTrue()",
               $"{br}\t{{",
                 $"{br}\t\t// Arrange",
-                $"{br}\t\tvar {lowerCaseFileName} = new {fileName}()",
-                $"{br}\t\t{{"];
-    string[] unitTestPart3 = [
-                $"{br}\t\t}};",
+                $"{br}\t\tvar dbCtxStub = await GetDbContext();",
+                $"{br}\t\t{fileName} {lowerCaseFileName} = await dbCtxStub.{pluralName}.FirstOrDefaultAsync();",
+                $"{br}\t\t{fileName}Repo sut = new(dbCtxStub);",
                 $"{br}\t\t// Act",
-                $"{br}\t\tvar result = _{lowerCaseFileName}Repo.Delete({lowerCaseFileName});",
+                $"{br}\t\tvar result = sut.Delete({lowerCaseFileName});",
                 $"{br}\t\t// Assert",
                 $"{br}\t\tAssert.True(result);",
               $"{br}\t}}", br,
 
               $"{br}\t[Fact]",
-              $"{br}\tpublic void Update_ReturnsTrue()",
+              $"{br}\tpublic async Task {fileName}Repo_Update_ReturnsTrue()",
               $"{br}\t{{",
                 $"{br}\t\t// Arrange",
-                $"{br}\t\tvar {lowerCaseFileName} = new {fileName}()",
-                $"{br}\t\t{{"];
-    string[] unitTestPart4 = [
-                $"{br}\t\t}};",
+                $"{br}\t\tvar dbCtxStub = await GetDbContext();",
+                $"{br}\t\t{fileName} {lowerCaseFileName} = await dbCtxStub.{pluralName}.FirstOrDefaultAsync();",
+                $"{br}\t\t{fileName}Repo sut = new(dbCtxStub);",
                 $"{br}\t\t// Act",
-                $"{br}\t\tvar result = _{lowerCaseFileName}Repo.Update({lowerCaseFileName});",
+                $"{br}\t\tvar result = sut.Update({lowerCaseFileName});",
                 $"{br}\t\t// Assert",
                 $"{br}\t\tAssert.True(result);",
               $"{br}\t}}", br,
 
               $"{br}\t[Fact]",
-              $"{br}\tpublic void Save_ReturnsBool()",
+              $"{br}\tpublic async Task {fileName}Repo_Save_ReturnsBool()",
               $"{br}\t{{",
-                $"{br}\t\t// Arrange (empty)",
+                $"{br}\t\t// Arrange",
+                $"{br}\t\tvar dbCtxStub = await GetDbContext();",
+                $"{br}\t\t{fileName}Repo sut = new(dbCtxStub);",
                 $"{br}\t\t// Act",
-                $"{br}\t\tvar result = _{lowerCaseFileName}Repo.Save();",
+                $"{br}\t\tvar result = sut.Save();",
                 $"{br}\t\t// Assert",
                 $"{br}\t\tAssert.IsType<bool>(result);",
               $"{br}\t}}", br,
 
               $"{br}\t[Fact]",
-              $"{br}\tpublic async void GetByIdAsync_Returns{fileName}Task()",
+              $"{br}\tpublic async Task {fileName}Repo_GetByIdAsync_Returns{fileName}()",
               $"{br}\t{{",
                 $"{br}\t\t// Arrange",
+                $"{br}\t\tvar dbCtxStub = await GetDbContext();",
+                $"{br}\t\t{fileName}Repo sut = new(dbCtxStub);",
                 $"{br}\t\tvar id = {arrangedId};",
                 $"{br}\t\t// Act",
-                $"{br}\t\tvar result = await _{lowerCaseFileName}Repo.GetByIdAsync(id);",
+                $"{br}\t\tvar result = await sut.GetByIdAsync(id);",
                 $"{br}\t\t// Assert",
-                $"{br}\t\tawait Assert.IsType<Task<{fileName}>>(result);",
+                $"{br}\t\tAssert.IsType<{fileName}>(result);",
               $"{br}\t}}",
             $"{br}}}",
 
@@ -258,9 +253,7 @@ public static class BackEndTemplates
 
     return unitTestPart0.Concat(dbCtxMockData)
       .Concat(unitTestPart1).Concat(mockData).
-      Concat(unitTestPart2).Concat(mockData).
-      Concat(unitTestPart3).Concat(mockData).
-      Concat(unitTestPart4).ToArray();
+      Concat(unitTestPart2).ToArray();
   }
 
   public static string DiRepoService(string modelName)

@@ -45,10 +45,10 @@ public static class BackEnd
       {
         string property = Util.Capital(_userInput.Properties[i][j], true);
 
-        mockData.Add($"{br}\t\t{property} = {GetUnitTestMockData(_userInput.DataTypes[i][j])},");
 
-        if (_userInput.Properties[i][j].ToLower() != "id") // Id is hardcoded in the template
+        if (_userInput.Properties[i][j].ToLower() != "id") // Id is hardcoded in the template for GetDbContext()
         {
+          mockData.Add($"{br}\t\t\t{property} = {GetUnitTestMockData(_userInput.DataTypes[i][j])},");
           dbCtxMockData.Add($"{br}\t\t\t\t\t{property} = {GetUnitTestMockData(_userInput.DataTypes[i][j])},");
         }
       }
@@ -68,6 +68,7 @@ public static class BackEnd
         case "repository": 
           await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.Repository(model, model.Pluralize()), $"{model}Repo.cs");
           await Util.InsertWithCheck($"using {_userInput.ProjName}.Data.RepoInterfaces;{br}", _userInput.ProjPath, "program.cs", true);
+          await Util.InsertWithCheck($"using {_userInput.ProjName}.Data.Repos;{br}", _userInput.ProjPath, "program.cs", true);
           await Util.InsertWithCheck($"using {_userInput.ProjName}.Data.Models;{br}", _userInput.ProjPath, "program.cs", true);
           await Util.InsertWithCheck(BackEndTemplates.DiRepoService(model), _userInput.ProjPath, "program.cs");
           break;

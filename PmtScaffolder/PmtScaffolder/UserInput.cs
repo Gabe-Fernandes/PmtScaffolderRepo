@@ -7,8 +7,8 @@ public class UserInput
   public string OverWrite = string.Empty;
   public List<string> ErrorReport = [];
 
-  public string ProjPath { get; set; } = "C:\\dev\\PmtScaffolderRepo\\AutoGen\\AutoGen";
-  public string TestProjPath { get; set; } = "C:\\dev\\PmtScaffolderRepo\\AutoGen\\AutoGenTests";
+  public string ProjPath { get; set; } = "C:\\dev\\PmtsRepo\\AutoGen\\AutoGen";
+  public string TestProjPath { get; set; } = "C:\\dev\\PmtsRepo\\AutoGen\\AutoGenTests";
   public string ProjName { get; set; } = "AutoGen";
   public string TestProjName { get; set; } = "AutoGenTests";
 
