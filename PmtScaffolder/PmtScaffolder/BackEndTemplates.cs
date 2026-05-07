@@ -175,7 +175,7 @@ public static class BackEndTemplates
                       $"{br}\t\t\t\t\t{idInstantiation}"];
     string[] unitTestPart1 = [
                     $"{br}\t\t\t\t}});",
-                    $"{br}\t\t\t\tawait dbContext.SaveChangesAsync();",
+                    $"{br}\t\t\t\tawait dbContext.SaveChanges();",
                   $"{br}\t\t\t}}",
                 $"{br}\t\t}}",
                 $"{br}\t\treturn dbContext;",
