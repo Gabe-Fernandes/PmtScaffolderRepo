@@ -55,6 +55,24 @@ public static class Validation
     return true;
   }
 
+  public static bool ValidHookupCmd(string normalizedInput, string input)
+  {
+    if (regex.IsMatch(input[11..]))
+    {
+      // pmt hookup HomeMenu,HM
+      int commaLocation = input.IndexOf(','); // 19
+      if (commaLocation == -1) { return false; }
+      string repoName = input[11..commaLocation];
+      string repoShorthand = input[(commaLocation + 1)..];
+      _userInput.ProjName = repoShorthand;
+      _userInput.ProjPath = $"C:\\dev\\{repoName}\\{repoShorthand}\\{repoShorthand}";
+      _userInput.TestProjName = $"{repoShorthand}Tests";
+      _userInput.TestProjPath = $"C:\\dev\\{repoName}\\{repoShorthand}\\{repoShorthand}Tests";
+      return true;
+    }
+    return false;
+  }
+
   public static bool ValidSetCmd(string normalizedInput, string input)
   {
     if (normalizedInput.IndexOf("proj-path ") == 8 &&

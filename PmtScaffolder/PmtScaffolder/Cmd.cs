@@ -51,9 +51,13 @@ public static class Cmd
         return true;
     }
 
-    if (normalizedInput.IndexOf("pmt set ") == 0)
+    if (normalizedInput.StartsWith("pmt set "))
     {
       return Validation.ValidSetCmd(normalizedInput, input);
+    }
+    else if (normalizedInput.StartsWith("pmt hookup "))
+    {
+      return Validation.ValidHookupCmd(normalizedInput, input);
     }
 
     return false;
@@ -246,11 +250,11 @@ public static class Cmd
   {
     Console.WriteLine("\n==================== PMT ====================\n");
     Console.WriteLine("pmt exit");
-    Console.WriteLine("exit");
+    Console.WriteLine("end program");
     Console.WriteLine("pmt cls");
-    Console.WriteLine("cls");
+    Console.WriteLine("clear");
     Console.WriteLine("pmt help");
-    Console.WriteLine("pmt");
+    Console.WriteLine("user manual");
 
     Console.WriteLine("\npmt get proj-path");
     Console.WriteLine("pmt get proj-name");
@@ -275,7 +279,9 @@ public static class Cmd
     Console.WriteLine("pmt set proj-path");
     Console.WriteLine("pmt set proj-name");
     Console.WriteLine("pmt set test-proj-path");
-    Console.WriteLine("pmt set test-proj-name");
+    Console.WriteLine("pmt set test-proj-name\n");
+    Console.WriteLine("pmt hookup");
+    Console.WriteLine("Supply the repo name and shorthand (ex. HomeMenu HM). The scaffolder will try to hookup the necessary paths.");
 
     Console.WriteLine("pmt set controllers");
     Console.WriteLine("pmt set file-names");
