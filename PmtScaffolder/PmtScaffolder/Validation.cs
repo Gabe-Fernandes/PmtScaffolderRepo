@@ -65,9 +65,9 @@ public static class Validation
       string repoName = input[11..commaLocation];
       string repoShorthand = input[(commaLocation + 1)..];
       _userInput.ProjName = repoShorthand;
-      _userInput.ProjPath = $"C:\\dev\\{repoName}\\{repoShorthand}\\{repoShorthand}";
+      _userInput.ProjPath = $"C:/dev/{repoName}Repo/{repoShorthand}/{repoShorthand}";
       _userInput.TestProjName = $"{repoShorthand}Tests";
-      _userInput.TestProjPath = $"C:\\dev\\{repoName}\\{repoShorthand}\\{repoShorthand}Tests";
+      _userInput.TestProjPath = $"C:/dev/{repoName}Repo/{repoShorthand}/{repoShorthand}Tests";
       return true;
     }
     return false;
