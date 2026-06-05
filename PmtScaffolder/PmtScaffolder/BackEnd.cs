@@ -59,7 +59,7 @@ public static class BackEnd
           await PSCmd.RunPowerShellBatch(filePath, BackEndTemplates.ModelClassHeader(model).Concat(GetProperties(i)).ToArray(), $"{model}.cs");
           if (model != "AppUser")
           {
-            await Util.InsertCode(_userInput.ProjPath + "/Data", BackEndTemplates.DbSet(model, model.Pluralize()), "AppDbContext.cs");
+            await Util.InsertWithCheck(BackEndTemplates.DbSet(model, model.Pluralize()), _userInput.ProjPath + "/Data", "AppDbContext.cs");
           }
           break;
         case "repo interface":
@@ -87,7 +87,7 @@ public static class BackEnd
     {
       "string" => "\"test string\"",
       "int" => "2",
-      "float" => "2.5",
+      "float" => "2.5f",
       "double" => "2.5",
       "bool" => "true",
       "DateTime" => "DateTime.Now",

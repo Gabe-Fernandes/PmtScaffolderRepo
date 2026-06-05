@@ -50,7 +50,7 @@ public static class FrontEnd
           case "js": await PSCmd.RunPowerShellBatch(currentControllerPath, FrontEndTemplates.JsFile(file), file + ".js"); break;
           case "cshtml": await PSCmd.RunPowerShellBatch(currentControllerPath, FrontEndTemplates.CsHtmlFile(file, controller), file + ".cshtml");
                          await Util.InsertWithCheck(FrontEndTemplates.CssLinkEle(file), currentControllerPath, $"_{controller}_Layout.cshtml", insertAtTop: false, "<!--PMT Landmark-->");
-                         await Util.InsertCode(_userInput.ProjPath + "/Controllers", FrontEndTemplates.ControllerGetMethod(file), $"{controller}Controller.cs"); break;
+                         await Util.InsertWithCheck(FrontEndTemplates.ControllerGetMethod(file), _userInput.ProjPath + "/Controllers", $"{controller}Controller.cs", customTestLine: file); break;
         }
       }
     }

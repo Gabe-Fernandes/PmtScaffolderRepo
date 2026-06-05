@@ -14,10 +14,10 @@ public static class Util
 
 
 
-  public static async Task InsertWithCheck(string lineToInsert, string pathToCheck, string fileNameWithExtension, bool insertAtTop = false, string landmark = "// PMT Landmark")
+  public static async Task InsertWithCheck(string lineToInsert, string pathToCheck, string fileNameWithExtension, bool insertAtTop = false, string landmark = "// PMT Landmark", string customTestLine = "")
   {
     string fileText = await ExtractFileText(pathToCheck, fileNameWithExtension);
-    string testLineToInsert = lineToInsert.Replace("PMT_TAB", "\t");
+    string testLineToInsert = (customTestLine == string.Empty) ? lineToInsert.Replace("PMT_TAB", "\t") : customTestLine;
 
     // check if the line to insert already exists
     if (fileText.Contains(testLineToInsert) == false)
